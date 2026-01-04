@@ -8,22 +8,23 @@
         body { background-color: #F2F4F6; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
         .navbar { background-color: #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 15px 0; }
         .nav-link { color: #4E5968; font-weight: 600; font-size: 17px; margin-left: 20px; }
-        .nav-link:hover { color: #3182F6; } /* 마우스 올리면 토스 파란색 */
+        .nav-link:hover { color: #3182F6; }
         .main-title { font-weight: 800; font-size: 40px; color: #191F28; margin-top: 80px; }
         .sub-title { font-size: 20px; color: #8B95A1; margin-top: 10px; }
-        .toss-btn { background-color: #3182F6; color: white; padding: 15px 30px; border-radius: 12px; font-weight: bold; border: none; margin-top: 40px; font-size: 18px;}
+        .toss-btn { background-color: #3182F6; color: white; padding: 15px 30px; border-radius: 12px; font-weight: bold; border: none; margin-top: 40px; font-size: 18px; text-decoration: none; display: inline-block;}
+        .toss-btn:hover { background-color: #1b64da; color: white; }
     </style>
 </head>
 <body>
 
 <nav class="navbar navbar-expand-lg">
     <div class="container">
-        <a class="navbar-brand" href="#" style="font-weight: 900; font-size: 24px; color: #3182F6;">Toss Dividend</a>
+        <a class="navbar-brand" href="/" style="font-weight: 900; font-size: 24px; color: #3182F6;">Toss Dividend</a>
         <div class="collapse navbar-collapse">
             <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link" href="#">1. 배당 캘린더</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">2. 배당 계산기</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">3. 성장률 차트</a></li>
+                <li class="nav-item"><a class="nav-link" href="/calendar">1. 배당 캘린더</a></li>
+                <li class="nav-item"><a class="nav-link" href="/calculator">2. 배당 계산기</a></li>
+                <li class="nav-item"><a class="nav-link" href="/chart">3. 성장률 차트</a></li>
             </ul>
         </div>
     </div>
@@ -32,7 +33,7 @@
 <div class="container text-center">
     <h1 class="main-title">모든 투자의 시작,<br>배당금부터 알아볼까요?</h1>
     <p class="sub-title">내 자산이 매달 얼마나 불어나는지<br>가장 정확하게 알려드릴게요.</p>
-    <button class="toss-btn">내 배당금 확인하기</button>
+    <a href="/calculator" class="toss-btn">내 배당금 확인하기</a>
 </div>
 
 </body>
