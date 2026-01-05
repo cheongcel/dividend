@@ -27,6 +27,7 @@ dependencies {
 
 	// [변경] 야후 라이브러리 삭제하고 Jsoup 추가 (이게 사람인 척 해주는 도구입니다)
 	implementation 'org.jsoup:jsoup:1.17.2'
+
 }
 tasks.named('test') {
 	useJUnitPlatform()

@@ -1,8 +1,5 @@
 package com.eunji.dividend;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.jsoup.Jsoup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,14 +15,6 @@ public class CalculatorController {
     @Autowired
     private DividendRepository dividendRepository;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
-    // ========================================================
-    // 🔑복사한 FMP API 키
-    // ========================================================
-    private final String API_KEY = "kuW27XRpN6heNXulR7gwOQyaN2cPULSY";
-    // 예: private final String API_KEY = "1a2b3c4d5e...";
-
     @GetMapping("/")
     public String showMain() { return "index"; }
 
@@ -38,84 +27,73 @@ public class CalculatorController {
             @RequestParam("quantity") int quantity,
             Model model
     ) {
-        ticker = ticker.trim().toUpperCase();
+        ticker = ticker.trim().toUpperCase(); // 대문자로 변환
         String name = "";
         BigDecimal price = BigDecimal.ZERO;
         BigDecimal monthlyDividend = BigDecimal.ZERO;
 
         try {
-            // 1. [캐시 확인] DB에 있으면 DB 씀 (아까운 무료 횟수 아끼기 위해)
+            // 1. [캐시 확인] DB에 저장된 게 있는지 먼저 본다
             DividendEntity existingData = dividendRepository.findByTicker(ticker);
 
             if (existingData != null) {
-                System.out.println("⚡ [캐시 적중] DB 사용: " + ticker);
+                System.out.println("⚡ [캐시 적중] DB 사용: " + existingData.getCompanyName());
                 name = existingData.getCompanyName();
                 price = new BigDecimal(existingData.getPrice());
                 monthlyDividend = new BigDecimal(existingData.getDividend());
             } else {
-                System.out.println("🚀 [FMP API 요청] 진짜 데이터 가지러 감: " + ticker);
+                System.out.println("🛠️ [시뮬레이션 모드] 가상 데이터 생성: " + ticker);
 
-                // 2. FMP API 주소 만들기
-                // 한국 주식(.KS)은 FMP에서 인식이 잘 안될 수 있어서 일단 미국 주식 위주로 테스트 추천
-                String url = "https://financialmodelingprep.com/api/v3/profile/" + ticker + "?apikey=" + API_KEY;
-
-                // 3. 데이터 가져오기 (JSON)
-                String jsonResult = Jsoup.connect(url)
-                        .ignoreContentType(true)
-                        .timeout(10000)
-                        .execute()
-                        .body();
-
-                // 4. JSON 해석
-                JsonNode root = objectMapper.readTree(jsonResult);
-
-                // 데이터가 비어있으면 (없는 종목)
-                if (root.isEmpty()) {
-                    throw new RuntimeException("FMP에서 종목을 찾을 수 없습니다. (" + ticker + ")");
-                }
-
-                JsonNode data = root.get(0); // 첫 번째 결과
-
-                // 회사 이름
-                name = data.path("companyName").asText();
-
-                // 가격
-                double rawPrice = data.path("price").asDouble();
-                price = new BigDecimal(String.valueOf(rawPrice));
-
-                // 마지막 배당금 (lastDiv) - FMP는 '최근 지급된 배당금'을 줍니다.
-                double lastDiv = data.path("lastDiv").asDouble();
-
-                // 환율 적용 (한국 주식 아니면)
-                if (!ticker.endsWith(".KS")) {
-                    BigDecimal exchangeRate = new BigDecimal("1430");
-                    price = price.multiply(exchangeRate);
-                    // lastDiv는 보통 연간 배당 기준이거나 최근 배당일 수 있음. MVP에선 연배당으로 가정
-                    BigDecimal annualDividend = new BigDecimal(String.valueOf(lastDiv)).multiply(exchangeRate);
-
-                    // 월 배당금 계산
-                    monthlyDividend = annualDividend
-                            .multiply(new BigDecimal(quantity))
-                            .divide(new BigDecimal(12), 0, BigDecimal.ROUND_HALF_UP);
+                // 🎰 시뮬레이션 엔진: 종목에 맞는 현실적인 데이터 생성
+                if (ticker.endsWith(".KS")) {
+                    if (ticker.contains("005930")) {
+                        name = "Samsung Electronics";
+                        price = new BigDecimal("75800");
+                        monthlyDividend = new BigDecimal("120").multiply(new BigDecimal(quantity));
+                    } else if (ticker.contains("005380")) {
+                        name = "Hyundai Motor";
+                        price = new BigDecimal("245000");
+                        monthlyDividend = new BigDecimal("800").multiply(new BigDecimal(quantity));
+                    } else {
+                        name = "Korea Stock (" + ticker + ")";
+                        price = new BigDecimal("50000");
+                        monthlyDividend = new BigDecimal("100").multiply(new BigDecimal(quantity));
+                    }
                 } else {
-                    // 한국 주식인 경우
-                    monthlyDividend = new BigDecimal(String.valueOf(lastDiv))
-                            .multiply(new BigDecimal(quantity))
-                            .divide(new BigDecimal(12), 0, BigDecimal.ROUND_HALF_UP);
+                    if (ticker.equals("AAPL")) {
+                        name = "Apple Inc.";
+                        price = new BigDecimal("286000"); // 환율 적용
+                        monthlyDividend = new BigDecimal("120").multiply(new BigDecimal(quantity));
+                    } else if (ticker.equals("O")) {
+                        name = "Realty Income";
+                        price = new BigDecimal("78650");
+                        monthlyDividend = new BigDecimal("357").multiply(new BigDecimal(quantity));
+                    } else if (ticker.equals("TSLA")) {
+                        name = "Tesla, Inc.";
+                        price = new BigDecimal("357500");
+                        monthlyDividend = BigDecimal.ZERO;
+                    } else if (ticker.equals("MSFT")) {
+                        name = "Microsoft Corp";
+                        price = new BigDecimal("572000");
+                        monthlyDividend = new BigDecimal("360").multiply(new BigDecimal(quantity));
+                    } else {
+                        name = "US Stock (" + ticker + ")";
+                        price = new BigDecimal("143000");
+                        monthlyDividend = new BigDecimal("200").multiply(new BigDecimal(quantity));
+                    }
                 }
 
-                // 5. DB 저장
+                // 2. DB 저장
                 DividendEntity entity = new DividendEntity(
                         name, ticker, price.toString(), monthlyDividend.toString()
                 );
                 dividendRepository.save(entity);
-                System.out.println("✅ [FMP] 정식 데이터 저장 완료: " + name);
+                System.out.println("✅ DB 저장 완료: " + name);
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("❌ FMP 에러: " + e.getMessage());
-            model.addAttribute("error", "API 오류: " + e.getMessage() + " (키를 확인해주세요)");
+            model.addAttribute("error", "오류 발생: " + e.getMessage());
             return "calculator";
         }
 
