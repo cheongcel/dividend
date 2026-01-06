@@ -134,6 +134,8 @@ public class CalculatorController {
     @GetMapping("/calendar")
     public String showCalendar() { return "calendar"; }
 
+
+
     @GetMapping("/chart")
     public String showChart() { return "chart"; } // [수정됨] 여기에 닫는 괄호 } 추가 완료!
 

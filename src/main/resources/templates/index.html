@@ -1,39 +1,314 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>토스증권 스타일 배당금</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>배당금 계산기</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
     <style>
-        body { background-color: #F2F4F6; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
-        .navbar { background-color: #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 15px 0; }
-        .nav-link { color: #4E5968; font-weight: 600; font-size: 17px; margin-left: 20px; }
-        .nav-link:hover { color: #3182F6; }
-        .main-title { font-weight: 800; font-size: 40px; color: #191F28; margin-top: 80px; }
-        .sub-title { font-size: 20px; color: #8B95A1; margin-top: 10px; }
-        .toss-btn { background-color: #3182F6; color: white; padding: 15px 30px; border-radius: 12px; font-weight: bold; border: none; margin-top: 40px; font-size: 18px; text-decoration: none; display: inline-block;}
-        .toss-btn:hover { background-color: #1b64da; color: white; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", Roboto, "Noto Sans KR", sans-serif;
+            background-color: #F2F4F6;
+            min-height: 100vh;
+        }
+
+        /* 네비게이션 */
+        .navbar {
+            background-color: #ffffff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            padding: 16px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            font-weight: 800;
+            font-size: 24px;
+            color: #3182F6;
+            text-decoration: none;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-link {
+            color: #4E5968;
+            font-weight: 600;
+            font-size: 16px;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover {
+            color: #3182F6;
+        }
+
+        /* 메인 컨텐츠 */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 80px 24px;
+            text-align: center;
+        }
+
+        .main-title {
+            font-weight: 800;
+            font-size: 48px;
+            color: #191F28;
+            line-height: 1.4;
+            letter-spacing: -1px;
+            margin-bottom: 24px;
+        }
+
+        .sub-title {
+            font-size: 20px;
+            color: #8B95A1;
+            line-height: 1.6;
+            margin-bottom: 60px;
+        }
+
+        /* 카드 컨테이너 */
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* 토스 스타일 카드 */
+        .toss-card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 32px 28px;
+            text-decoration: none;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+            border: 2px solid transparent;
+        }
+
+        .toss-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(49, 130, 246, 0.03) 0%, rgba(49, 130, 246, 0) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .toss-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 16px 32px rgba(49, 130, 246, 0.12);
+            border-color: #3182F6;
+        }
+
+        .toss-card:hover::before {
+            opacity: 1;
+        }
+
+        .toss-card:active {
+            transform: translateY(-4px);
+        }
+
+        .card-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            display: block;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .toss-card:hover .card-icon {
+            transform: scale(1.15) rotate(5deg);
+        }
+
+        .card-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #191F28;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .card-desc {
+            font-size: 15px;
+            font-weight: 400;
+            color: #8B95A1;
+            line-height: 1.5;
+            letter-spacing: -0.3px;
+        }
+
+        /* CTA 버튼 */
+        .cta-section {
+            margin-top: 80px;
+            padding: 60px 24px;
+            background: linear-gradient(135deg, #3182F6 0%, #1b64da 100%);
+            border-radius: 24px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 16px;
+            letter-spacing: -0.5px;
+        }
+
+        .cta-desc {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 32px;
+        }
+
+        .toss-btn {
+            background-color: white;
+            color: #3182F6;
+            padding: 18px 48px;
+            border-radius: 12px;
+            font-weight: 700;
+            border: none;
+            font-size: 18px;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .toss-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .toss-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* 로딩 애니메이션 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .main-title, .sub-title {
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .card-container .toss-card {
+            animation: fadeInUp 0.6s ease-out backwards;
+        }
+
+        .card-container .toss-card:nth-child(1) { animation-delay: 0.1s; }
+        .card-container .toss-card:nth-child(2) { animation-delay: 0.2s; }
+        .card-container .toss-card:nth-child(3) { animation-delay: 0.3s; }
+
+        /* 반응형 */
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+
+            .main-title {
+                font-size: 36px;
+            }
+
+            .sub-title {
+                font-size: 18px;
+            }
+
+            .card-container {
+                grid-template-columns: 1fr;
+            }
+
+            .cta-title {
+                font-size: 26px;
+            }
+
+            .cta-desc {
+                font-size: 16px;
+            }
+        }
     </style>
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg">
-    <div class="container">
-        <a class="navbar-brand" href="/" style="font-weight: 900; font-size: 24px; color: #3182F6;">Toss Dividend</a>
-        <div class="collapse navbar-collapse">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link" href="/calendar">1. 배당 캘린더</a></li>
-                <li class="nav-item"><a class="nav-link" href="/calculator">2. 배당 계산기</a></li>
-                <li class="nav-item"><a class="nav-link" href="/chart">3. 성장률 차트</a></li>
-            </ul>
-        </div>
+<!-- 네비게이션 -->
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="/" class="nav-brand">💰 배당금 포트폴리오</a>
+        <ul class="nav-menu">
+            <li><a href="/calculator" class="nav-link">배당 계산기</a></li>
+            <li><a href="/goal" class="nav-link">파이어족 목표</a></li>
+            <li><a href="/calendar" class="nav-link">배당 캘린더</a></li>
+        </ul>
     </div>
 </nav>
 
-<div class="container text-center">
+<!-- 메인 컨텐츠 -->
+<div class="main-container">
     <h1 class="main-title">모든 투자의 시작,<br>배당금부터 알아볼까요?</h1>
     <p class="sub-title">내 자산이 매달 얼마나 불어나는지<br>가장 정확하게 알려드릴게요.</p>
-    <a href="/calculator" class="toss-btn">내 배당금 확인하기</a>
+
+    <!-- 카드 섹션 -->
+    <div class="card-container">
+        <a href="/calculator" class="toss-card">
+            <span class="card-icon">🧮</span>
+            <div class="card-title">배당금 계산기</div>
+            <div class="card-desc">주식을 추가하고<br>월급처럼 받는 배당금을 계산해보세요</div>
+        </a>
+
+        <a href="/goal" class="toss-card">
+            <span class="card-icon">🏆</span>
+            <div class="card-title">파이어족 목표</div>
+            <div class="card-desc">경제적 자유까지<br>얼마나 남았는지 확인하세요</div>
+        </a>
+
+        <a href="/calendar" class="toss-card">
+            <span class="card-icon">📅</span>
+            <div class="card-title">배당금 달력</div>
+            <div class="card-desc">이번 달 받을 배당금을<br>한눈에 확인하세요</div>
+        </a>
+    </div>
+
+    <!-- CTA 섹션 -->
+    <div class="cta-section">
+        <h2 class="cta-title">지금 바로 시작해보세요</h2>
+        <p class="cta-desc">복잡한 계산은 이제 그만, 3초면 충분합니다</p>
+        <a href="/calculator" class="toss-btn">내 배당금 확인하기 →</a>
+    </div>
 </div>
 
 </body>
