@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>배당 목표 계산기</title>
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; background-color: #f0f2f5; padding: 20px; }
+        .container { max-width: 500px; margin: 0 auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #333; margin-bottom: 30px; }
+
+        /* 입력 폼 스타일 */
+        .input-group { display: flex; gap: 10px; margin-bottom: 20px; }
+        input[type="number"] { flex: 1; padding: 15px; border: 2px solid #ddd; border-radius: 10px; font-size: 18px; }
+        button { padding: 15px 25px; background-color: #007bff; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+
+        /* 프로그레스 바 (게이지) */
+        .progress-container { background-color: #e9ecef; border-radius: 20px; height: 30px; margin: 30px 0 10px 0; overflow: hidden; }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #ffc107, #ff9800); /* 노란색 그라데이션 */
+            text-align: right;
+            line-height: 30px;
+            color: white;
+            padding-right: 10px;
+            font-weight: bold;
+            transition: width 1s ease-in-out; /* 스르륵 차오르는 애니메이션 */
+        }
+
+        /* 결과 카드 스타일 */
+        .result-card { background-color: #f8f9fa; padding: 20px; border-radius: 10px; border-left: 5px solid #007bff; margin-top: 20px; }
+        .highlight { color: #d63384; font-weight: bold; font-size: 1.2em; }
+        .money { color: #28a745; font-weight: bold; }
+
+        .menu { margin-top: 30px; text-align: center; }
+        .menu a { text-decoration: none; color: #666; margin: 0 10px; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>🎯 배당 파이어족 목표</h2>
+
+    <form action="/goal" method="get">
+        <div class="input-group">
+            <input type="number" name="targetMonthly" placeholder="목표 월 배당금 (원)" th:value="${targetMonthly}" required>
+            <button type="submit">계산하기</button>
+        </div>
+    </form>
+
+    <div th:if="${targetMonthly > 0}">
+
+        <div class="progress-container">
+            <div class="progress-bar" th:style="'width:' + ${progressPercent} + '%'">
+                <span th:text="${progressPercent} + '%'"></span>
+            </div>
+        </div>
+        <p style="text-align: center; color: #666;">현재 달성률</p>
+
+        <div class="result-card">
+            <p>사장님 소리 들으시려면...<br>
+                현금 <span class="highlight" th:text="${#numbers.formatInteger(neededMoney, 0, 'COMMA')} + '원'">12억</span>이 필요해요! 😱</p>
+
+            <hr style="border: 0; border-top: 1px dashed #ddd; margin: 15px 0;">
+
+            <p>지금 보유하신 주식으로는 턱도 없어요!<br>
+                목표까지 삼성전자 <span class="highlight" th:text="${#numbers.formatInteger(neededShares, 0, 'COMMA')} + '주'">16,000주</span> 남았습니다.</p>
+
+            <p style="margin-top: 10px; font-size: 0.9em; color: #888;">
+                * 삼성전자(우) 기준으로 계산된 수치입니다.
+            </p>
+        </div>
+
+        <div style="text-align: center; margin-top: 20px;">
+            <h3>🔥 할 수 있어요!</h3>
+            <p>오늘 치킨 한 마리 덜 먹으면<br>삼성전자 0.3주 더 살 수 있습니다.</p>
+        </div>
+    </div>
+
+    <div class="menu">
+        <a href="/calculator">계산기로 돌아가기</a> |
+        <a href="/calendar">📅 캘린더 보기</a>
+    </div>
+</div>
+
+</body>
+</html>
