@@ -1,8 +1,75 @@
 <!DOCTYPE html>
-<html>
-<head><title>준비 중</title></head>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>배당금 캘린더</title>
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; background-color: #f0f2f5; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+
+        /* 헤더 스타일 */
+        .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #f0f0f0; padding-bottom: 20px; }
+        .total-badge { background-color: #e7f5ff; color: #007bff; padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 0.9em; }
+        .big-money { font-size: 2em; font-weight: bold; color: #333; margin: 10px 0; }
+
+        /* 월별 카드 스타일 */
+        .month-card {
+            background: white; border: 1px solid #eee; border-radius: 10px;
+            margin-bottom: 15px; padding: 15px; transition: 0.2s;
+        }
+        .month-card:hover { transform: translateY(-2px); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+
+        /* 돈 들어오는 달 (강조) */
+        .active-month { border-left: 5px solid #28a745; }
+        /* 돈 안 들어오는 달 (흐리게) */
+        .empty-month { opacity: 0.5; background-color: #f9f9f9; }
+
+        .month-header { display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
+        .month-name { font-size: 1.2em; }
+        .month-total { color: #28a745; font-size: 1.1em; }
+
+        .detail-list { margin-top: 10px; padding-top: 10px; border-top: 1px dashed #eee; font-size: 0.9em; color: #666; }
+        .detail-item { display: flex; justify-content: space-between; margin-bottom: 5px; }
+
+        .menu { margin-top: 30px; text-align: center; }
+        .menu a { text-decoration: none; color: #666; margin: 0 10px; font-size: 14px; }
+    </style>
+</head>
 <body>
-<h1>🚧 열심히 공사 중입니다! 🚧</h1>
-<a href="/">메인으로 돌아가기</a>
+
+<div class="container">
+
+    <div class="header">
+        <span class="total-badge">2026년 예상 배당금</span>
+        <div class="big-money" th:text="${#numbers.formatInteger(totalAnnual, 0, 'COMMA')} + '원'">1,200,000원</div>
+        <p style="color: #888; font-size: 0.9em;">숨만 쉬어도 들어오는 돈이에요 💸</p>
+    </div>
+
+    <div th:each="total, stat : ${monthlyTotals}">
+
+        <div class="month-card" th:classappend="${total > 0} ? 'active-month' : 'empty-month'">
+
+            <div class="month-header">
+                <span class="month-name" th:text="${stat.count} + '월'">1월</span>
+                <span class="month-total" th:if="${total > 0}" th:text="${#numbers.formatInteger(total, 0, 'COMMA')} + '원'">10,000원</span>
+                <span style="font-size: 0.8em; color: #ccc;" th:if="${total == 0}">입금 없음</span>
+            </div>
+
+            <div class="detail-list" th:if="${total > 0}">
+                <div class="detail-item" th:each="detail : ${monthlyDetails[stat.index]}">
+                    <span th:text="${#strings.arraySplit(detail, ':')[0]}">삼성전자</span>
+                    <span th:text="${#strings.arraySplit(detail, ':')[1]}">300원</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="menu">
+        <a href="/calculator">🧮 계산기</a> |
+        <a href="/goal">🏆 목표 보기</a>
+    </div>
+</div>
+
 </body>
 </html>
