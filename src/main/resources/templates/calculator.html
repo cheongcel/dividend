@@ -3,41 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <title>배당금 계산기</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
     <style>
-        body { background-color: #F2F4F6; padding-top: 50px; }
-        .card { border-radius: 20px; border: none; padding: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
-        .result-box { background-color: #E8F3FF; padding: 20px; border-radius: 15px; color: #3182F6; font-weight: bold; font-size: 24px; margin-top: 20px; }
+        body { margin: 0; padding: 0; font-family: "Pretendard", sans-serif; background-color: #F2F4F6; color: #333; }
+
+        /* 네비게이션 (공통) */
+        .navbar { background-color: white; padding: 15px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
+        .nav-container { max-width: 600px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
+        .nav-brand { font-weight: 800; font-size: 20px; color: #3182F6; text-decoration: none; }
+        .nav-menu a { text-decoration: none; color: #666; font-weight: 600; margin-left: 15px; font-size: 14px; transition: color 0.2s; }
+        .nav-menu a:hover { color: #3182F6; }
+
+        .container { max-width: 600px; margin: 40px auto; padding: 0 20px; }
+        h2 { font-size: 24px; font-weight: 700; color: #191F28; margin-bottom: 10px; }
+        p.subtitle { color: #8B95A1; margin-bottom: 30px; font-size: 15px; }
+
+        /* 입력 카드 */
+        .card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-weight: 600; color: #4E5968; margin-bottom: 8px; font-size: 14px; }
+        input { width: 100%; padding: 15px; border: 1px solid #E5E8EB; border-radius: 12px; font-size: 16px; outline: none; transition: 0.2s; box-sizing: border-box; }
+        input:focus { border-color: #3182F6; box-shadow: 0 0 0 2px rgba(49, 130, 246, 0.1); }
+
+        button { width: 100%; padding: 18px; background-color: #3182F6; color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.2s; margin-top: 10px; }
+        button:hover { background-color: #1b64da; transform: translateY(-2px); }
+
+        /* 결과 영역 */
+        .result-box { margin-top: 30px; animation: slideUp 0.5s ease-out; }
+        .result-card { background: white; padding: 25px; border-radius: 20px; text-align: center; border: 2px solid #E5E8EB; }
+        .company-name { font-size: 16px; color: #666; margin-bottom: 5px; }
+        .dividend-amount { font-size: 32px; font-weight: 800; color: #3182F6; margin: 10px 0; }
+        .price-info { background-color: #F9FAFB; padding: 10px; border-radius: 10px; color: #8B95A1; font-size: 13px; display: inline-block; margin-top: 10px; }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
-<div class="container" style="max-width: 500px;">
-    <div class="card">
-        <h2 class="fw-bold text-center mb-4">배당금 계산기💸 </h2>
 
-        <form action="/calculate" method="POST">
-            <div class="mb-3">
-                <label class="form-label fw-bold">종목 이름</label>
-                <input type="text" name="ticker" class="form-control" placeholder="예: AAPL" required>
-            </div>
-            <div class="mb-3">
-                <label class="form-label fw-bold">보유 주식 수</label>
-                <input type="number" name="quantity" class="form-control" placeholder="몇 주 가지고 계신가요?" required>
-            </div>
-            <button type="submit" class="btn btn-primary w-100 py-3 fw-bold" style="background-color: #3182F6; border: none;">
-                계산하기
-            </button>
-        </form>
-
-        <div th:if="${result != null}" class="result-box text-center">
-            <p class="mb-0">예상 월 배당금</p>
-            <span th:text="${result} + '원'">0원</span>
-        </div>
-
-        <div class="text-center mt-3">
-            <a href="/" style="color: #8B95A1; text-decoration: none;">메인으로 돌아가기</a>
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="/" class="nav-brand">💰 Divy</a>
+        <div class="nav-menu">
+            <a href="/calculator" style="color:#3182F6">계산기</a>
+            <a href="/goal">목표</a>
+            <a href="/calendar">캘린더</a>
         </div>
     </div>
+</nav>
+
+<div class="container">
+    <h2>배당금 계산기 🧮</h2>
+    <p class="subtitle">보유한 주식을 입력하면 월 배당금을 계산해드려요.</p>
+
+    <div class="card">
+        <form action="/calculate" method="post">
+            <div class="form-group">
+                <label>종목 코드 (Ticker)</label>
+                <input type="text" name="ticker" placeholder="예: AAPL, 005930.KS" required>
+            </div>
+            <div class="form-group">
+                <label>보유 수량 (주)</label>
+                <input type="number" name="quantity" placeholder="몇 주 가지고 계신가요?" required>
+            </div>
+            <button type="submit">계산 및 저장하기</button>
+        </form>
+    </div>
+
+    <div class="result-box" th:if="${result != null}">
+        <div class="result-card">
+            <div class="company-name" th:text="${companyName}">삼성전자</div>
+            <div class="dividend-amount" th:text="${#numbers.formatInteger(result, 0, 'COMMA')} + '원'">3,600원</div>
+            <p style="margin:0; color:#4E5968; font-weight:600;">예상 월 배당금</p>
+            <div class="price-info">
+                현재 주가: <span th:text="${#numbers.formatInteger(price, 0, 'COMMA')}">70,000</span>원
+            </div>
+        </div>
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="/calendar" style="color: #8B95A1; text-decoration: none; font-size: 14px; border-bottom: 1px solid #ddd;">📅 캘린더에서 확인하기</a>
+        </div>
+    </div>
+
+    <div th:if="${error != null}" style="color: red; text-align: center; margin-top: 20px;" th:text="${error}"></div>
 </div>
+
 </body>
 </html>
