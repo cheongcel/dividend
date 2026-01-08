@@ -1,0 +1,15 @@
+INSERT INTO stock (ticker, name) VALUES ('005930.KS', '삼성전자');
+INSERT INTO stock (ticker, name) VALUES ('005935.KS', '삼성전자우');
+INSERT INTO stock (ticker, name) VALUES ('000660.KS', 'SK하이닉스');
+INSERT INTO stock (ticker, name) VALUES ('005380.KS', '현대차');
+INSERT INTO stock (ticker, name) VALUES ('035420.KS', 'NAVER');
+INSERT INTO stock (ticker, name) VALUES ('035720.KS', '카카오');
+INSERT INTO stock (ticker, name) VALUES ('AAPL', '애플 (Apple)');
+INSERT INTO stock (ticker, name) VALUES ('MSFT', '마이크로소프트');
+INSERT INTO stock (ticker, name) VALUES ('TSLA', '테슬라 (Tesla)');
+INSERT INTO stock (ticker, name) VALUES ('O', '리얼티인컴 (Realty Income)');
+INSERT INTO stock (ticker, name) VALUES ('SCHD', 'SCHD (배당 ETF)');
+INSERT INTO stock (ticker, name) VALUES ('JEPI', 'JEPI (월배당 ETF)');
+INSERT INTO stock (ticker, name) VALUES ('KO', '코카콜라 (Coca-Cola)');
+INSERT INTO stock (ticker, name) VALUES ('SBUX', '스타벅스 (Starbucks)');
+INSERT INTO stock (ticker, name) VALUES ('NVDA', '엔비디아 (NVIDIA)');
