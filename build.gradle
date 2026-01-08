@@ -25,9 +25,10 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-	// [변경] 야후 라이브러리 삭제하고 Jsoup 추가 (이게 사람인 척 해주는 도구입니다)
+	// [변경] 야후 라이브러리 삭제하고 Jsoup 추가
 	implementation 'org.jsoup:jsoup:1.17.2'
 
+	implementation 'com.yahoofinance-api:YahooFinanceAPI:3.17.0'
 }
 tasks.named('test') {
 	useJUnitPlatform()

@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <style>
+            /* ... 기존 스타일 ... */
+        </style>
     <meta charset="UTF-8">
     <title>배당금 계산기</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -69,6 +73,19 @@
     </div>
 
     <div class="result-box" th:if="${result != null}">
+            <div class="result-card">
+                <div class="company-name" th:text="${companyName}">삼성전자</div>
+                <div class="dividend-amount" th:text="${#numbers.formatInteger(result.dividendAmount, 0, 'COMMA')} + '원'"></div>
+
+                <div style="height: 200px; margin-top: 20px;">
+                    <canvas id="dividendChart"></canvas>
+                </div>
+
+                <div class="price-info">
+                    현재 주가: <span th:text="${#numbers.formatInteger(result.price, 0, 'COMMA')}"></span>원
+                </div>
+            </div>
+        </div>
         <div class="result-card">
             <div class="company-name" th:text="${companyName}">삼성전자</div>
             <div class="dividend-amount" th:text="${#numbers.formatInteger(result, 0, 'COMMA')} + '원'"></div>
@@ -87,6 +104,43 @@
     const suggestionsBox = document.getElementById("suggestions");
 
     function filterStocks() {
+        // ... 기존 자동완성 스크립트들 ...
+
+        // 👇 차트 그리기 스크립트 (Thymeleaf 변수 받기)
+        // result가 있을 때만 실행되게 안전장치
+        /*[# th:if="${result != null}"]*/
+        document.addEventListener("DOMContentLoaded", function() {
+            const ctx = document.getElementById('dividendChart');
+            if (!ctx) return;
+
+            // 서버에서 보낸 데이터 받기 (자바 변수 -> 자바스크립트로 변환)
+            const monthlyData = [[${result.monthlyData}]];
+
+            new Chart(ctx, {
+                type: 'bar', // 막대그래프
+                data: {
+                    labels: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+                    datasets: [{
+                        label: '예상 배당금',
+                        data: monthlyData,
+                        backgroundColor: '#3182F6', // 파란색
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false } // 범례 숨김 (깔끔하게)
+                    },
+                    scales: {
+                        y: { beginAtZero: true, grid: { display: false } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        });
+        /*[/]*/
         const query = searchInput.value;
         if (query.length < 1) {
             suggestionsBox.style.display = "none";
