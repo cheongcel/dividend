@@ -61,16 +61,15 @@
             padding: 2px 6px; border-radius: 4px;
         }
 
-        /* 결과 */
+        /* 결과 박스 스타일 */
         .result-box { margin-top: 30px; animation: slideUp 0.5s ease-out; }
         .result-card {
             background: white; padding: 25px; border-radius: 20px;
             text-align: center; border: 2px solid #E5E8EB;
         }
-        .company-name { font-size: 16px; color: #666; margin-bottom: 5px; }
         .dividend-amount {
             font-size: 32px; font-weight: 800; color: #3182F6;
-            margin: 10px 0;
+            margin: 5px 0; /* 간격 조정 */
         }
         .price-info {
             margin-top: 15px; font-size: 14px; color: #4E5968;
@@ -114,29 +113,36 @@
         </form>
     </div>
 
-    <!-- 결과 표시 (하나로 통합) -->
     <div class="result-box" th:if="${result != null}">
         <div class="result-card">
-            <div class="company-name" th:text="${companyName}">삼성전자</div>
-            <div class="dividend-amount"
-                 th:text="${#numbers.formatInteger(result.dividendAmount, 0, 'COMMA')} + '원'">
-                10,000원
-            </div>
-            <p style="margin:0; color:#4E5968;">예상 월 배당금</p>
 
-            <!-- 차트 -->
-            <div style="height: 250px; margin-top: 25px;">
+            <div style="font-size: 15px; color: #8B95A1; font-weight: 500; margin-bottom: 2px;">
+                <span th:text="${result.companyName}">Apple Inc.</span>
+            </div>
+
+            <div class="dividend-amount"
+                 th:text="'월 약 ' + ${#numbers.formatInteger(result.dividendAmount, 0, 'COMMA')} + '원'">
+                월 약 10,000원
+            </div>
+
+            <div style="font-size: 14px; color: #8B95A1; margin-bottom: 20px;">
+                (연간 총 배당금: <span th:text="${#numbers.formatInteger(result.totalAnnualDividend, 0, 'COMMA')}">120,000</span>원)
+            </div>
+
+            <p style="margin:0; color:#6b7684; font-size: 13px; background-color: #f2f4f6; padding: 10px; border-radius: 8px;">
+                💡 실제로는 <span style="font-weight:bold;">그래프에 표시된 달</span>에만 입금돼요!
+            </p>
+
+            <div style="height: 250px; margin-top: 20px;">
                 <canvas id="dividendChart"></canvas>
             </div>
 
-            <!-- 현재가 정보 -->
-            <div class="price-info">
-                현재 주가: <span th:text="${#numbers.formatInteger(result.price, 0, 'COMMA')}">75,000</span>원
+            <div class="price-info" style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #f2f4f6;">
+                현재 1주 가격: <span style="font-weight:bold;" th:text="${#numbers.formatInteger(result.price, 0, 'COMMA')}">75,000</span>원
             </div>
         </div>
     </div>
 
-    <!-- 에러 메시지 -->
     <div th:if="${error != null}"
          style="color: red; text-align: center; margin-top: 20px;"
          th:text="${error}"></div>
@@ -190,7 +196,7 @@
         tickerInput.value = this.value;
     });
 
-    // 차트 렌더링 (result가 있을 때만)
+    // 차트 렌더링 (안전장치 포함)
     /*[# th:if="${result != null}"]*/
     document.addEventListener("DOMContentLoaded", function() {
         const ctx = document.getElementById('dividendChart');
