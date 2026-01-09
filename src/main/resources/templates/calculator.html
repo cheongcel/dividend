@@ -1,45 +1,84 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <style>
-            /* ... 기존 스타일 ... */
-        </style>
     <meta charset="UTF-8">
     <title>배당금 계산기</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
+    <link rel="stylesheet" as="style" crossorigin
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
-        body { margin: 0; padding: 0; font-family: "Pretendard", sans-serif; background-color: #F2F4F6; color: #333; }
-        .navbar { background-color: white; padding: 15px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
-        .nav-container { max-width: 600px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
-        .nav-brand { font-weight: 800; font-size: 20px; color: #3182F6; text-decoration: none; }
-        .nav-menu a { text-decoration: none; color: #666; font-weight: 600; margin-left: 15px; font-size: 14px; transition: color 0.2s; }
+        body { margin: 0; padding: 0; font-family: "Pretendard", sans-serif;
+            background-color: #F2F4F6; color: #333; }
+        .navbar { background-color: white; padding: 15px 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            position: sticky; top: 0; z-index: 100; }
+        .nav-container { max-width: 600px; margin: 0 auto;
+            display: flex; justify-content: space-between;
+            align-items: center; padding: 0 20px; }
+        .nav-brand { font-weight: 800; font-size: 20px;
+            color: #3182F6; text-decoration: none; }
+        .nav-menu a { text-decoration: none; color: #666;
+            font-weight: 600; margin-left: 15px;
+            font-size: 14px; transition: color 0.2s; }
         .nav-menu a:hover { color: #3182F6; }
         .container { max-width: 600px; margin: 40px auto; padding: 0 20px; }
-        .card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); position: relative; }
+        .card { background: white; padding: 30px; border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
         .form-group { margin-bottom: 20px; position: relative; }
-        label { display: block; font-weight: 600; color: #4E5968; margin-bottom: 8px; font-size: 14px; }
-        input { width: 100%; padding: 15px; border: 1px solid #E5E8EB; border-radius: 12px; font-size: 16px; outline: none; transition: 0.2s; box-sizing: border-box; }
-        input:focus { border-color: #3182F6; box-shadow: 0 0 0 2px rgba(49, 130, 246, 0.1); }
-        button { width: 100%; padding: 18px; background-color: #3182F6; color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.2s; margin-top: 10px; }
+        label { display: block; font-weight: 600; color: #4E5968;
+            margin-bottom: 8px; font-size: 14px; }
+        input { width: 100%; padding: 15px; border: 1px solid #E5E8EB;
+            border-radius: 12px; font-size: 16px; outline: none;
+            transition: 0.2s; box-sizing: border-box; }
+        input:focus { border-color: #3182F6;
+            box-shadow: 0 0 0 2px rgba(49, 130, 246, 0.1); }
+        button { width: 100%; padding: 18px; background-color: #3182F6;
+            color: white; border: none; border-radius: 12px;
+            font-size: 16px; font-weight: 700; cursor: pointer;
+            transition: 0.2s; margin-top: 10px; }
+        button:hover { background-color: #2563EB; }
 
-        /* 자동완성 리스트 */
+        /* 자동완성 */
         .suggestions-list {
-            position: absolute; top: 100%; left: 0; width: 100%; background: white;
-            border: 1px solid #E5E8EB; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            z-index: 1000; max-height: 250px; overflow-y: auto; display: none;
+            position: absolute; top: 100%; left: 0; width: 100%;
+            background: white; border: 1px solid #E5E8EB;
+            border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            z-index: 1000; max-height: 250px; overflow-y: auto;
+            display: none;
         }
-        .suggestion-item { padding: 12px 15px; cursor: pointer; border-bottom: 1px solid #f2f2f2; font-size: 15px; display: flex; justify-content: space-between; }
-        .suggestion-item:hover { background-color: #F2F4F6; color: #3182F6; }
-        .code-badge { font-size: 12px; color: #8B95A1; background: #f2f4f6; padding: 2px 6px; border-radius: 4px; }
+        .suggestion-item {
+            padding: 12px 15px; cursor: pointer;
+            border-bottom: 1px solid #f2f2f2; font-size: 15px;
+            display: flex; justify-content: space-between;
+        }
+        .suggestion-item:hover {
+            background-color: #F2F4F6; color: #3182F6;
+        }
+        .code-badge {
+            font-size: 12px; color: #8B95A1; background: #f2f4f6;
+            padding: 2px 6px; border-radius: 4px;
+        }
 
-        /* 결과 박스 */
+        /* 결과 */
         .result-box { margin-top: 30px; animation: slideUp 0.5s ease-out; }
-        .result-card { background: white; padding: 25px; border-radius: 20px; text-align: center; border: 2px solid #E5E8EB; }
+        .result-card {
+            background: white; padding: 25px; border-radius: 20px;
+            text-align: center; border: 2px solid #E5E8EB;
+        }
         .company-name { font-size: 16px; color: #666; margin-bottom: 5px; }
-        .dividend-amount { font-size: 32px; font-weight: 800; color: #3182F6; margin: 10px 0; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .dividend-amount {
+            font-size: 32px; font-weight: 800; color: #3182F6;
+            margin: 10px 0;
+        }
+        .price-info {
+            margin-top: 15px; font-size: 14px; color: #4E5968;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
@@ -60,94 +99,61 @@
         <form action="/calculate" method="post" autocomplete="off">
             <div class="form-group">
                 <label>종목 검색</label>
-                <input type="text" id="searchInput" placeholder="예: 삼성전자, Apple" onkeyup="filterStocks()" required>
+                <input type="text" id="searchInput"
+                       placeholder="예: 삼성전자, Apple"
+                       onkeyup="filterStocks()" required>
                 <input type="hidden" id="tickerInput" name="ticker">
                 <div id="suggestions" class="suggestions-list"></div>
             </div>
             <div class="form-group">
                 <label>보유 수량</label>
-                <input type="number" name="quantity" placeholder="몇 주?" required>
+                <input type="number" name="quantity"
+                       placeholder="몇 주?" required>
             </div>
             <button type="submit">계산하기</button>
         </form>
     </div>
 
+    <!-- 결과 표시 (하나로 통합) -->
     <div class="result-box" th:if="${result != null}">
-            <div class="result-card">
-                <div class="company-name" th:text="${companyName}">삼성전자</div>
-                <div class="dividend-amount" th:text="${#numbers.formatInteger(result.dividendAmount, 0, 'COMMA')} + '원'"></div>
-
-                <div style="height: 200px; margin-top: 20px;">
-                    <canvas id="dividendChart"></canvas>
-                </div>
-
-                <div class="price-info">
-                    현재 주가: <span th:text="${#numbers.formatInteger(result.price, 0, 'COMMA')}"></span>원
-                </div>
-            </div>
-        </div>
         <div class="result-card">
             <div class="company-name" th:text="${companyName}">삼성전자</div>
-            <div class="dividend-amount" th:text="${#numbers.formatInteger(result, 0, 'COMMA')} + '원'"></div>
+            <div class="dividend-amount"
+                 th:text="${#numbers.formatInteger(result.dividendAmount, 0, 'COMMA')} + '원'">
+                10,000원
+            </div>
             <p style="margin:0; color:#4E5968;">예상 월 배당금</p>
-            <div style="margin-top:10px; font-size:13px; color:#888;">
-                현재가: <span th:text="${#numbers.formatInteger(price, 0, 'COMMA')}"></span>원
+
+            <!-- 차트 -->
+            <div style="height: 250px; margin-top: 25px;">
+                <canvas id="dividendChart"></canvas>
+            </div>
+
+            <!-- 현재가 정보 -->
+            <div class="price-info">
+                현재 주가: <span th:text="${#numbers.formatInteger(result.price, 0, 'COMMA')}">75,000</span>원
             </div>
         </div>
     </div>
-    <div th:if="${error != null}" style="color: red; text-align: center; margin-top: 20px;" th:text="${error}"></div>
+
+    <!-- 에러 메시지 -->
+    <div th:if="${error != null}"
+         style="color: red; text-align: center; margin-top: 20px;"
+         th:text="${error}"></div>
 </div>
 
-<script>
+<script th:inline="javascript">
     const searchInput = document.getElementById("searchInput");
     const tickerInput = document.getElementById("tickerInput");
     const suggestionsBox = document.getElementById("suggestions");
 
     function filterStocks() {
-        // ... 기존 자동완성 스크립트들 ...
-
-        // 👇 차트 그리기 스크립트 (Thymeleaf 변수 받기)
-        // result가 있을 때만 실행되게 안전장치
-        /*[# th:if="${result != null}"]*/
-        document.addEventListener("DOMContentLoaded", function() {
-            const ctx = document.getElementById('dividendChart');
-            if (!ctx) return;
-
-            // 서버에서 보낸 데이터 받기 (자바 변수 -> 자바스크립트로 변환)
-            const monthlyData = [[${result.monthlyData}]];
-
-            new Chart(ctx, {
-                type: 'bar', // 막대그래프
-                data: {
-                    labels: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
-                    datasets: [{
-                        label: '예상 배당금',
-                        data: monthlyData,
-                        backgroundColor: '#3182F6', // 파란색
-                        borderRadius: 5
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false } // 범례 숨김 (깔끔하게)
-                    },
-                    scales: {
-                        y: { beginAtZero: true, grid: { display: false } },
-                        x: { grid: { display: false } }
-                    }
-                }
-            });
-        });
-        /*[/]*/
         const query = searchInput.value;
         if (query.length < 1) {
             suggestionsBox.style.display = "none";
             return;
         }
 
-        // API 호출
         fetch('/api/autocomplete?keyword=' + query)
             .then(response => response.json())
             .then(data => {
@@ -180,10 +186,61 @@
         }
     });
 
-    // 목록에 없는 거 입력 시
     searchInput.addEventListener('input', function() {
         tickerInput.value = this.value;
     });
+
+    // 차트 렌더링 (result가 있을 때만)
+    /*[# th:if="${result != null}"]*/
+    document.addEventListener("DOMContentLoaded", function() {
+        const ctx = document.getElementById('dividendChart');
+        if (!ctx) return;
+
+        // Thymeleaf에서 자바스크립트 변수로 전달
+        const monthlyData = /*[[${result.monthlyData}]]*/ [0,0,0,0,0,0,0,0,0,0,0,0];
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['1월', '2월', '3월', '4월', '5월', '6월',
+                    '7월', '8월', '9월', '10월', '11월', '12월'],
+                datasets: [{
+                    label: '예상 배당금',
+                    data: monthlyData,
+                    backgroundColor: '#3182F6',
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.parsed.y.toLocaleString() + '원';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { display: false },
+                        ticks: {
+                            callback: function(value) {
+                                return value.toLocaleString() + '원';
+                            }
+                        }
+                    },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    });
+    /*[/]*/
 </script>
+
 </body>
 </html>

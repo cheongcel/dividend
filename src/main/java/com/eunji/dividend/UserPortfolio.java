@@ -4,29 +4,28 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
+@Getter @Setter
+@NoArgsConstructor
 public class UserPortfolio {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String ticker;   // 종목 코드
-    private int quantity;    // 수량
-
-    public UserPortfolio() {
-    }
+    private String ticker;
+    private int quantity;
 
     public UserPortfolio(String ticker, int quantity) {
         this.ticker = ticker;
         this.quantity = quantity;
     }
 
-    public void addQuantity(int amount) {
-        this.quantity += amount;
+    public void addQuantity(int quantity) {
+        this.quantity += quantity;
     }
-
-    public String getTicker() { return ticker; }
-    public int getQuantity() { return quantity; }
 }
