@@ -135,21 +135,22 @@
 
             <div style="height: 250px; margin-top: 20px;">
                 <canvas id="dividendChart"></canvas>
-                <div style="height: 250px; margin-top: 20px;">
-                    <canvas id="dividendChart"></canvas>
-                </div>
+            </div>
 
-                <form th:if="${result != null}" action="/add" method="post" style="margin-top: 25px;">
-                    <input type="hidden" name="ticker" th:value="${searchTicker}">
-                    <input type="hidden" name="quantity" th:value="${searchQuantity}">
+            <form th:if="${result != null}" action="/add" method="post" style="margin-top: 10px;">
+                <input type="hidden" name="ticker" th:value="${searchTicker}">
+                <input type="hidden" name="quantity" th:value="${searchQuantity}">
 
-                    <button type="submit"
-                            style="width: 100%; padding: 18px; background-color: #333; color: white;
+                <button type="submit"
+                        style="width: 100%; padding: 18px; background-color: #3182F6; color: white;
                                border: none; border-radius: 12px; font-size: 16px; font-weight: 700;
-                               cursor: pointer;">
-                        📂 내 포트폴리오에 저장하기
-                    </button>
-                </form>
+                               cursor: pointer; transition: background-color 0.2s;">
+                    📂 내 포트폴리오에 저장하기
+                </button>
+                <style>
+                    form button[type="submit"]:hover { background-color: #2563EB !important; }
+                </style>
+            </form>
             </div>
 
             <div class="price-info" style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #f2f4f6;">
