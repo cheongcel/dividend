@@ -49,7 +49,7 @@ public class CalculatorController {
         return "redirect:/calendar";
     }
 
-    // 3. 삭제하기 (새로 추가된 기능!)
+    // 3. 삭제하기
     @PostMapping("/delete")
     public String deleteStock(@RequestParam("ticker") String ticker) {
         UserPortfolio portfolio = userPortfolioRepository.findByTicker(ticker);
@@ -59,10 +59,10 @@ public class CalculatorController {
         return "redirect:/calendar";
     }
 
-    // ⭐ [여기가 문제 해결의 핵심!] 캘린더 보여주기
+    // 4. 캘린더 보여주기
     @GetMapping("/calendar")
     public String showCalendar(Model model) {
-        // 1. 빈 달력 틀 만들기 (1월~12월)
+        // 1. 빈 달력 틀 만들기
         List<BigDecimal> monthlyTotals = new ArrayList<>(Collections.nCopies(12, BigDecimal.ZERO));
         List<List<String>> monthlyDetails = new ArrayList<>();
         for (int i = 0; i < 12; i++) monthlyDetails.add(new ArrayList<>());
@@ -71,69 +71,120 @@ public class CalculatorController {
         List<UserPortfolio> myStocks = userPortfolioRepository.findAll();
         BigDecimal totalAnnual = BigDecimal.ZERO;
 
-        // 숫자 예쁘게 꾸미기용 (3자리 콤마)
+        // 숫자 꾸미기용 (1,000)
         DecimalFormat df = new DecimalFormat("#,###");
 
         for (UserPortfolio stock : myStocks) {
             DividendEntity info = dividendRepository.findByTicker(stock.getTicker());
 
-            // 데이터가 없거나 이상하면 건너뛰기 (null 방지)
             if (info == null || info.getDividend() == null || info.getDividend().equals("null")) continue;
 
             try {
-                // DB에서 "14500" 같은 글자를 숫자로 변환
                 BigDecimal annualPerShare = new BigDecimal(info.getDividend());
                 BigDecimal quantity = new BigDecimal(stock.getQuantity());
 
-                // 내 총 배당금 = 주당배당금 * 수량
                 BigDecimal myTotalAnnual = annualPerShare.multiply(quantity);
                 totalAnnual = totalAnnual.add(myTotalAnnual);
 
-                // 배당 월 분석 (예: "2,5,8,11")
                 String monthsStr = info.getDividendMonths();
                 String[] months;
                 if (monthsStr == null || monthsStr.isEmpty()) {
-                    months = new String[]{}; // 배당월 없으면 패스
+                    months = new String[]{};
                 } else {
                     months = monthsStr.split(",");
                 }
 
-                // 월별로 나누기
                 if (months.length > 0) {
-                    // 소수점 버리고 계산 (나누기)
                     BigDecimal splitAmount = myTotalAnnual.divide(new BigDecimal(months.length), 0, RoundingMode.HALF_UP);
 
                     for (String m : months) {
                         try {
-                            int monthIdx = Integer.parseInt(m.trim()) - 1; // 1월 -> 0번 인덱스
+                            int monthIdx = Integer.parseInt(m.trim()) - 1;
                             if (monthIdx >= 0 && monthIdx < 12) {
-                                // 1. 총합 더하기
                                 monthlyTotals.set(monthIdx, monthlyTotals.get(monthIdx).add(splitAmount));
-
-                                // 2. 상세 내역 추가 ("삼성전자: 15,000원")
                                 String detailText = info.getCompanyName() + ": " + df.format(splitAmount) + "원";
                                 monthlyDetails.get(monthIdx).add(detailText);
                             }
-                        } catch (Exception e) {
-                            // 날짜 파싱 에러나면 무시
-                        }
+                        } catch (Exception e) {}
                     }
                 }
             } catch (Exception e) {
-                System.out.println("⚠️ 캘린더 계산 중 에러 (" + stock.getTicker() + "): " + e.getMessage());
+                System.out.println("⚠️ 캘린더 계산 에러 (" + stock.getTicker() + "): " + e.getMessage());
             }
         }
 
-        // HTML로 데이터 보내기
         model.addAttribute("totalAnnual", totalAnnual);
         model.addAttribute("monthlyTotals", monthlyTotals);
-        model.addAttribute("monthlyDetails", monthlyDetails); // 여기에 상세 내역이 들어있음!
-        //+
-        model.addAttribute("myStocks", myStocks);
+        model.addAttribute("monthlyDetails", monthlyDetails);
+        model.addAttribute("myStocks", myStocks); // 내 주식 목록도 전달
 
         return "calendar";
     }
 
+    // 5. ⭐ [핵심 수정] 파이어족 목표 페이지 (에러 해결됨)
     @GetMapping("/goal")
-    public String showGoal() { return "goal"; }
+    public String showGoal(@RequestParam(value = "targetMonthly", required = false, defaultValue = "0") int targetMonthly, Model model) {
+
+        List<UserPortfolio> myStocks = userPortfolioRepository.findAll();
+        BigDecimal currentAnnualDividend = BigDecimal.ZERO;
+
+        for (UserPortfolio stock : myStocks) {
+            DividendEntity info = dividendRepository.findByTicker(stock.getTicker());
+            if (info != null && info.getDividend() != null && !info.getDividend().equals("null")) {
+                try {
+                    BigDecimal stockTotal = new BigDecimal(info.getDividend()).multiply(new BigDecimal(stock.getQuantity()));
+                    currentAnnualDividend = currentAnnualDividend.add(stockTotal);
+                } catch (Exception e) {}
+            }
+        }
+
+        model.addAttribute("targetMonthly", targetMonthly);
+        model.addAttribute("currentAnnual", currentAnnualDividend);
+
+        if (targetMonthly == 0) {
+            model.addAttribute("progressPercent", 0);
+            return "goal";
+        }
+
+        // 1. 목표 금액 계산 (단위: 만원 -> 원)
+        BigDecimal realTargetMonthly = new BigDecimal(targetMonthly).multiply(new BigDecimal("10000"));
+        BigDecimal targetAnnual = realTargetMonthly.multiply(new BigDecimal(12));
+
+        BigDecimal gap = targetAnnual.subtract(currentAnnualDividend);
+
+        // 2. 달성률 계산
+        double percent = 0.0;
+        if (targetAnnual.compareTo(BigDecimal.ZERO) > 0) {
+            percent = currentAnnualDividend.doubleValue() / targetAnnual.doubleValue() * 100;
+        }
+        if (percent > 100) percent = 100;
+
+        // 3. 삼성전자 환산
+        BigDecimal samsungDividend = new BigDecimal("1444");
+        BigDecimal neededShares = BigDecimal.ZERO;
+        BigDecimal gapAmount = BigDecimal.ZERO;
+
+        if (gap.compareTo(BigDecimal.ZERO) > 0) {
+            gapAmount = gap;
+            neededShares = gap.divide(samsungDividend, 0, RoundingMode.UP);
+        }
+
+        // 4. ⭐ [추가됨] HTML에서 에러나지 않도록 여기서 미리 월 금액을 계산해서 보냅니다!
+        BigDecimal currentMonthly = currentAnnualDividend.divide(new BigDecimal(12), 0, RoundingMode.HALF_UP);
+        BigDecimal gapMonthly = BigDecimal.ZERO;
+        if (gapAmount.compareTo(BigDecimal.ZERO) > 0) {
+            gapMonthly = gapAmount.divide(new BigDecimal(12), 0, RoundingMode.HALF_UP);
+        }
+
+        // 5. 모델에 담기
+        model.addAttribute("progressPercent", String.format("%.1f", percent));
+        model.addAttribute("neededShares", neededShares);
+        model.addAttribute("gapAmount", gapAmount);
+
+        // 새로 만든 월 단위 변수들도 전달
+        model.addAttribute("currentMonthly", currentMonthly);
+        model.addAttribute("gapMonthly", gapMonthly);
+
+        return "goal";
+    }
 }
