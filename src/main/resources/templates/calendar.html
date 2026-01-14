@@ -4,45 +4,123 @@
     <meta charset="UTF-8">
     <title>배당금 달력</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
+    <link rel="stylesheet" as="style" crossorigin
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
+
     <style>
-        body { margin: 0; padding: 0; font-family: "Pretendard", sans-serif; background-color: #F2F4F6; color: #333; }
-
-        .navbar { background-color: white; padding: 15px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
-        .nav-container { max-width: 600px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
-        .nav-brand { font-weight: 800; font-size: 20px; color: #3182F6; text-decoration: none; }
-        .nav-menu a { text-decoration: none; color: #666; font-weight: 600; margin-left: 15px; font-size: 14px; transition: color 0.2s; }
+        body { margin: 0; padding: 0; font-family: "Pretendard", sans-serif;
+            background-color: #F2F4F6; color: #333; }
+        .navbar { background-color: white; padding: 15px 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            position: sticky; top: 0; z-index: 100; }
+        .nav-container { max-width: 600px; margin: 0 auto;
+            display: flex; justify-content: space-between;
+            align-items: center; padding: 0 20px; }
+        .nav-brand { font-weight: 800; font-size: 20px;
+            color: #3182F6; text-decoration: none; }
+        .nav-menu a { text-decoration: none; color: #666;
+            font-weight: 600; margin-left: 15px;
+            font-size: 14px; transition: color 0.2s; }
         .nav-menu a:hover { color: #3182F6; }
+        .container { max-width: 600px; margin: 30px auto; padding: 0 20px; }
 
-        .container { max-width: 600px; margin: 40px auto; padding: 0 20px; }
+        /* 공통 카드 */
+        .card { background: white; padding: 25px; border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 20px; }
 
-        /* 헤더 섹션 */
-        .header-card { background: white; padding: 30px; border-radius: 24px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
-        .badge { background: #E8F3FF; color: #3182F6; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 700; display: inline-block; margin-bottom: 10px; }
-        .total-amount { font-size: 36px; font-weight: 800; color: #191F28; margin: 5px 0; letter-spacing: -1px; }
-        .desc { color: #8B95A1; font-size: 15px; margin-bottom: 0; }
+        /* 헤더 스타일 */
+        .header-section { text-align: center; margin-bottom: 30px; }
+        .year-badge {
+            background-color: #E8F3FF; color: #3182F6;
+            padding: 6px 14px; border-radius: 20px;
+            font-size: 13px; font-weight: 700;
+            display: inline-block; margin-bottom: 10px;
+        }
+        .total-amount-text {
+            font-size: 36px; font-weight: 800; color: #333;
+            letter-spacing: -1px;
+        }
 
-        /* 월별 카드 */
-        .month-grid { display: grid; gap: 15px; }
-        .month-card { background: white; padding: 20px; border-radius: 18px; transition: all 0.2s; border: 1px solid transparent; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        /* 뷰 전환 토글 버튼 */
+        .view-toggle {
+            display: flex; justify-content: center; margin-bottom: 20px;
+            background-color: #E5E8EB; border-radius: 12px; padding: 4px;
+            width: fit-content; margin-left: auto; margin-right: auto;
+        }
+        .toggle-btn {
+            padding: 8px 16px; border-radius: 10px; border: none; cursor: pointer;
+            font-size: 13px; font-weight: 700; color: #6B7684; background: transparent;
+            transition: all 0.2s;
+        }
+        .toggle-btn.active {
+            background-color: white; color: #3182F6;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
 
-        .active-month { border-left: 5px solid #3182F6; }
-        .active-month:hover { transform: translateY(-3px); box-shadow: 0 8px 16px rgba(49, 130, 246, 0.1); border-color: rgba(49, 130, 246, 0.3); }
+        /* 내 주식 리스트 */
+        .stock-list-container::-webkit-scrollbar { width: 6px; }
+        .stock-list-container::-webkit-scrollbar-thumb { background-color: #E5E8EB; border-radius: 3px; }
+        .stock-list-container::-webkit-scrollbar-track { background-color: transparent; }
 
-        .empty-month { opacity: 0.6; background-color: #FAFAFA; }
+        /* === A. 바둑판 그리드 스타일 === */
+        .month-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+        }
+        .month-box {
+            background-color: white; border-radius: 16px; padding: 15px;
+            text-align: center; border: 1px solid #E5E8EB;
+            cursor: pointer; transition: 0.2s; position: relative;
+            height: 80px; display: flex; flex-direction: column; justify-content: center;
+        }
+        .month-box:hover { transform: translateY(-3px); border-color: #3182F6; }
+        .has-money { background-color: #F0F7FF; border-color: #D1E4FF; }
+        .month-label { font-size: 14px; color: #6B7684; margin-bottom: 5px; font-weight: 600; }
+        .month-amount { font-size: 15px; font-weight: 800; color: #333; }
+        .has-money .month-amount { color: #3182F6; }
 
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .month-title { font-size: 18px; font-weight: 700; color: #333; }
-        .month-money { font-size: 18px; font-weight: 700; color: #3182F6; }
+        /* === B. 리스트 뷰 스타일 === */
+        .list-view-container { display: flex; flex-direction: column; gap: 15px; }
+        .month-list-card {
+            background: white; padding: 20px; border-radius: 18px;
+            border: 1px solid transparent; box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+        .list-active { border-left: 5px solid #3182F6; }
+        .list-header { display: flex; justify-content: space-between; align-items: center; }
+        .list-title { font-size: 16px; font-weight: 700; color: #333; }
+        .list-total { font-size: 16px; font-weight: 700; color: #3182F6; }
+        .list-detail-item {
+            display: flex; justify-content: space-between;
+            font-size: 14px; color: #666; margin-top: 10px;
+            padding-top: 10px; border-top: 1px dashed #eee;
+        }
 
-        .detail-item { display: flex; justify-content: space-between; font-size: 14px; color: #666; margin-top: 6px; padding-top: 6px; border-top: 1px dashed #eee; }
+        /* 팝업(Modal) 스타일 */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5); z-index: 1000; align-items: center; justify-content: center;
+        }
+        .modal-card {
+            background: white; width: 85%; max-width: 350px; border-radius: 24px;
+            padding: 30px; position: relative; animation: popUp 0.3s;
+        }
+        .modal-title { font-size: 20px; font-weight: 800; margin-bottom: 20px; text-align: center; }
+        .modal-close { position: absolute; top: 15px; right: 20px; font-size: 24px; color: #ccc; cursor: pointer; }
+        .modal-total-highlight {
+            text-align: center; font-size: 28px; font-weight: 800; color: #3182F6;
+            margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px dashed #eee;
+        }
+        .detail-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 15px; }
+
+        @keyframes popUp { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-up { animation: slideUp 0.5s ease-out; }
     </style>
 </head>
 <body>
 
 <nav class="navbar">
     <div class="nav-container">
-        <a href="/" class="nav-brand">💰 Divy</a>
+        <a href="/" class="nav-brand">💰 DIVY</a>
         <div class="nav-menu">
             <a href="/calculator">계산기</a>
             <a href="/goal">목표</a>
@@ -53,33 +131,154 @@
 
 <div class="container">
 
-    <div class="header-card">
-        <span class="badge">2026년 예상 수령액</span>
-        <div class="total-amount" th:text="${#numbers.formatInteger(totalAnnual, 0, 'COMMA')} + '원'">0원</div>
-        <p class="desc">숨만 쉬어도 들어오는 소중한 월급 💸</p>
+    <div class="header-section">
+        <span class="year-badge">2026년 예상 수령액</span>
+        <div class="total-amount-text">
+            <span th:text="${#numbers.formatInteger(totalAnnual, 0, 'COMMA')}">0</span>원
+        </div>
     </div>
 
-    <div class="month-grid">
-        <div th:each="total, stat : ${monthlyTotals}"
-             class="month-card"
-             th:classappend="${total > 0} ? 'active-month' : 'empty-month'">
+    <div class="card animate-up">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #F2F4F6; padding-bottom: 15px;">
+            <h3 style="margin: 0; font-size: 18px; display: flex; align-items: center;">
+                📋 내 포트폴리오
+                <span style="background-color: #F2F4F6; color: #6B7684; font-size: 12px; padding: 2px 8px; border-radius: 10px; margin-left: 8px;"
+                      th:text="${myStocks.size()} + '개'">0개</span>
+            </h3>
+            <a href="/calculator"
+               style="text-decoration: none; background-color: #3182F6; color: white;
+                      padding: 8px 14px; border-radius: 8px; font-weight: 600; font-size: 13px;">
+                + 추가하기
+            </a>
+        </div>
 
-            <div class="card-header">
-                <span class="month-title" th:text="${stat.count} + '월'">1월</span>
-                <span class="month-money" th:if="${total > 0}" th:text="${#numbers.formatInteger(total, 0, 'COMMA')} + '원'"></span>
-                <span style="font-size:13px; color:#ccc;" th:if="${total == 0}">-</span>
+        <div class="stock-list-container" style="max-height: 200px; overflow-y: auto;">
+            <div th:if="${myStocks.isEmpty()}" style="text-align: center; color: #8B95A1; padding: 30px 0;">
+                <div style="font-size: 30px; margin-bottom: 10px;">📭</div>
+                아직 담은 주식이 없어요!
+            </div>
+            <div th:each="stock : ${myStocks}"
+                 style="display: flex; justify-content: space-between; align-items: center; padding: 12px 5px; border-bottom: 1px solid #F9FAFB;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 40px; height: 40px; background-color: #F2F4F6; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px; color: #6B7684;">
+                        <span th:text="${#strings.substring(stock.ticker, 0, 1)}">T</span>
+                    </div>
+                    <div>
+                        <div style="font-weight: 700; font-size: 15px; color: #333;" th:text="${stock.ticker}">TSLA</div>
+                        <div style="font-size: 13px; color: #8B95A1;" th:text="${stock.quantity} + '주'">10주</div>
+                    </div>
+                </div>
+                <form action="/delete" method="post" style="margin: 0;">
+                    <input type="hidden" name="ticker" th:value="${stock.ticker}">
+                    <button type="submit"
+                            style="background-color: white; color: #FF4B4B; border: 1px solid #FFE5E5;
+                                   padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 600;
+                                   cursor: pointer; transition: 0.2s;">삭제</button>
+                    <style>button[type="submit"]:hover { background-color: #FFF0F0 !important; border-color: #FF4B4B !important; }</style>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="view-toggle">
+        <button id="btnGrid" class="toggle-btn active" onclick="switchView('grid')">📅 달력형</button>
+        <button id="btnList" class="toggle-btn" onclick="switchView('list')">📝 리스트형</button>
+    </div>
+
+    <div id="gridView" class="month-grid animate-up">
+        <div th:each="total, stat : ${monthlyTotals}"
+             class="month-box"
+             th:classappend="${total > 0} ? 'has-money' : ''"
+             th:onclick="openModal([[${stat.count}]], [[${total}]], [[${monthlyDetails[stat.index]}]])">
+
+            <div class="month-label" th:text="${stat.count} + '월'">1월</div>
+            <div class="month-amount">
+                <span th:if="${total > 0}" th:text="${#numbers.formatInteger(total, 0, 'COMMA')} + '원'"></span>
+                <span th:if="${total == 0}" style="color:#ccc; font-weight:400;">-</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="listView" class="list-view-container animate-up" style="display: none;">
+        <div th:each="total, stat : ${monthlyTotals}"
+             class="month-list-card"
+             th:classappend="${total > 0} ? 'list-active' : ''"
+             th:style="${total == 0} ? 'opacity: 0.6; background-color: #FAFAFA;' : ''">
+
+            <div class="list-header">
+                <span class="list-title" th:text="${stat.count} + '월'">1월</span>
+                <span class="list-total"
+                      th:if="${total > 0}" th:text="${#numbers.formatInteger(total, 0, 'COMMA')} + '원'"></span>
+                <span th:if="${total == 0}" style="font-size:14px; color:#ccc;">-</span>
             </div>
 
             <div th:if="${total > 0}">
-                <div class="detail-item" th:each="detail : ${monthlyDetails[stat.index]}">
+                <div class="list-detail-item" th:each="detail : ${monthlyDetails[stat.index]}">
                     <span th:text="${#strings.arraySplit(detail, ':')[0]}">삼성전자</span>
-                    <span th:text="${#strings.arraySplit(detail, ':')[1]}">3,000원</span>
+                    <span style="font-weight: 600; color: #4E5968;"
+                          th:text="${#strings.arraySplit(detail, ':')[1]}">3,000원</span>
                 </div>
             </div>
         </div>
     </div>
 
 </div>
+
+<div id="dividendModal" class="modal-overlay" onclick="closeModal(event)">
+    <div class="modal-card">
+        <span class="modal-close" onclick="document.getElementById('dividendModal').style.display='none'">&times;</span>
+        <div id="modalTitle" class="modal-title">N월 상세 내역</div>
+        <div id="modalTotal" class="modal-total-highlight">0원</div>
+        <div id="modalContent" style="max-height: 200px; overflow-y: auto;"></div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    function switchView(mode) {
+        const gridView = document.getElementById('gridView');
+        const listView = document.getElementById('listView');
+        const btnGrid = document.getElementById('btnGrid');
+        const btnList = document.getElementById('btnList');
+
+        if (mode === 'grid') {
+            gridView.style.display = 'grid';
+            listView.style.display = 'none';
+            btnGrid.classList.add('active');
+            btnList.classList.remove('active');
+        } else {
+            gridView.style.display = 'none';
+            listView.style.display = 'flex';
+            btnGrid.classList.remove('active');
+            btnList.classList.add('active');
+        }
+    }
+
+    function openModal(month, total, details) {
+        if (total === 0) return;
+        document.getElementById('modalTitle').innerText = month + "월 배당금";
+        document.getElementById('modalTotal').innerText = total.toLocaleString() + "원";
+        const contentBox = document.getElementById('modalContent');
+        contentBox.innerHTML = "";
+        if (details && details.length > 0) {
+            details.forEach(item => {
+                let parts = item.split(": ");
+                let row = `
+                    <div class="detail-row">
+                        <span style="color:#555;">${parts[0]}</span>
+                        <span style="font-weight:700; color:#333;">${parts[1]}</span>
+                    </div>`;
+                contentBox.innerHTML += row;
+            });
+        }
+        document.getElementById('dividendModal').style.display = "flex";
+    }
+
+    function closeModal(event) {
+        if (event.target.id === 'dividendModal') {
+            document.getElementById('dividendModal').style.display = "none";
+        }
+    }
+</script>
 
 </body>
 </html>

@@ -128,6 +128,8 @@ public class CalculatorController {
         model.addAttribute("totalAnnual", totalAnnual);
         model.addAttribute("monthlyTotals", monthlyTotals);
         model.addAttribute("monthlyDetails", monthlyDetails); // 여기에 상세 내역이 들어있음!
+        //+
+        model.addAttribute("myStocks", myStocks);
 
         return "calendar";
     }
