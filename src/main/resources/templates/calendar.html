@@ -168,7 +168,7 @@
                         <div style="font-size: 13px; color: #8B95A1;" th:text="${stock.quantity} + '주'">10주</div>
                     </div>
                 </div>
-                <form action="/delete" method="post" style="margin: 0;">
+                <form action="/delete" method="post" style="margin: 0;" onsubmit="return confirm('정말 이 종목을 삭제하시겠습니까?');">
                     <input type="hidden" name="ticker" th:value="${stock.ticker}">
                     <button type="submit"
                             style="background-color: white; color: #FF4B4B; border: 1px solid #FFE5E5;
