@@ -69,10 +69,7 @@
         }
         .dividend-amount {
             font-size: 32px; font-weight: 800; color: #3182F6;
-            margin: 5px 0; /* 간격 조정 */
-        }
-        .price-info {
-            margin-top: 15px; font-size: 14px; color: #4E5968;
+            margin: 5px 0;
         }
         @keyframes slideUp {
             from { opacity: 0; transform: translateY(20px); }
@@ -137,7 +134,24 @@
                 <canvas id="dividendChart"></canvas>
             </div>
 
-            <form th:if="${result != null}" action="/add" method="post" style="margin-top: 10px;">
+            <div style="background-color: #F9FAFB; border-radius: 12px; padding: 20px; margin-top: 15px; display: flex; justify-content: space-between; align-items: center;">
+
+                <div style="text-align: left;">
+                    <span style="color: #6B7684; font-size: 13px; font-weight: 500;">현재 1주 가격</span><br>
+                    <span style="font-size: 18px; font-weight: 700; color: #333;"
+                          th:text="${#numbers.formatInteger(result.price, 0, 'COMMA')} + '원'">50,000원</span>
+                </div>
+
+                <div style="width: 1px; height: 40px; background-color: #E5E8EB;"></div>
+
+                <div style="text-align: right;">
+                    <span style="color: #6B7684; font-size: 13px; font-weight: 500;">연간 총 배당금</span><br>
+                    <span style="font-size: 18px; font-weight: 700; color: #3182F6;"
+                          th:text="${#numbers.formatInteger(result.totalAnnualDividend, 0, 'COMMA')} + '원'">120,000원</span>
+                </div>
+            </div>
+
+            <form th:if="${result != null}" action="/add" method="post" style="margin-top: 20px;">
                 <input type="hidden" name="ticker" th:value="${searchTicker}">
                 <input type="hidden" name="quantity" th:value="${searchQuantity}">
 
@@ -151,17 +165,10 @@
                     form button[type="submit"]:hover { background-color: #2563EB !important; }
                 </style>
             </form>
-            </div>
 
-            <div class="price-info" style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #f2f4f6;">
-                현재 1주 가격: <span style="font-weight:bold;" th:text="${#numbers.formatInteger(result.price, 0, 'COMMA')}">75,000</span>원
-            </div>
-        </div>
-    </div>
-
-    <div th:if="${error != null}"
-         style="color: red; text-align: center; margin-top: 20px;"
-         th:text="${error}"></div>
+        </div> </div> <div th:if="${error != null}"
+                           style="color: red; text-align: center; margin-top: 20px;"
+                           th:text="${error}"></div>
 </div>
 
 <script th:inline="javascript">
@@ -212,13 +219,11 @@
         tickerInput.value = this.value;
     });
 
-    // 차트 렌더링 (안전장치 포함)
     /*[# th:if="${result != null}"]*/
     document.addEventListener("DOMContentLoaded", function() {
         const ctx = document.getElementById('dividendChart');
         if (!ctx) return;
 
-        // Thymeleaf에서 자바스크립트 변수로 전달
         const monthlyData = /*[[${result.monthlyData}]]*/ [0,0,0,0,0,0,0,0,0,0,0,0];
 
         new Chart(ctx, {

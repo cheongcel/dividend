@@ -84,6 +84,7 @@ public class DividendService {
         BigDecimal price = new BigDecimal("50000");
         BigDecimal dividendPerShare = new BigDecimal("1000");
 
+
         // 미국 주식이면 환율 적용
         if (!ticker.endsWith(".KS")) {
             if (ticker.contains("AAPL")) {
