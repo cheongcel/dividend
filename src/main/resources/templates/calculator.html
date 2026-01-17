@@ -8,7 +8,6 @@
     <link rel="stylesheet" as="style" crossorigin
           href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <script src="apikey.js" onerror="console.log('apikey.js 없음')"></script>
 
     <style>
@@ -46,14 +45,12 @@
         input:focus { border-color: #3182F6;
             box-shadow: 0 0 0 2px rgba(49, 130, 246, 0.1); }
 
-        /* 자동완성 목록 스타일 */
         .suggestions-list {
             position: absolute; top: 100%; left: 0; width: 100%;
             background: white; border: 1px solid #E5E8EB;
             border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             z-index: 1000; max-height: 250px; overflow-y: auto;
-            display: none;
-            margin-top: 5px;
+            display: none; margin-top: 5px;
         }
         .suggestion-item {
             padding: 12px 15px; cursor: pointer;
@@ -80,25 +77,12 @@
         .dividend-amount { font-size: 32px; font-weight: 800; color: #3182F6; margin: 5px 0; }
         .mint-text { color: #00C851 !important; }
 
-        /* 세후 실수령액 박스 - 깔끔한 회색 배경 */
         .tax-info {
-            background: #F9FAFB;
-            padding: 20px;
-            border-radius: 12px;
-            margin-top: 15px;
-            border: 1px solid #E5E8EB;
+            background: #F9FAFB; padding: 20px; border-radius: 12px;
+            margin-top: 15px; border: 1px solid #E5E8EB;
         }
-        .tax-label {
-            font-size: 13px;
-            color: #6B7684;
-            margin-bottom: 8px;
-            font-weight: 600;
-        }
-        .tax-amount {
-            font-size: 20px;
-            font-weight: 800;
-            color: #00C851; /* 민트 = 돈 */
-        }
+        .tax-label { font-size: 13px; color: #6B7684; margin-bottom: 8px; font-weight: 600; }
+        .tax-amount { font-size: 20px; font-weight: 800; color: #00C851; }
 
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(30px); }
@@ -132,9 +116,7 @@
                    placeholder="예: 삼성전자, Apple, O"
                    autocomplete="off"
                    onkeyup="searchStocks()">
-
             <div id="suggestions" class="suggestions-list"></div>
-
             <small style="color: #8B95A1; font-size: 13px; margin-top: 4px; display:block;">
                 💡 리스트에 없는 종목은 티커(예: AAPL)를 직접 입력하세요.
             </small>
@@ -162,8 +144,9 @@
             <div style="font-size: 15px; color: #8B95A1; font-weight: 500; margin-bottom: 2px;">
                 <span id="resCompanyName">Apple Inc.</span>
             </div>
+
             <div class="dividend-amount">
-                월 약 <span id="resMonthlyDiv">0</span>원
+                월 평균 <span id="resMonthlyDiv">0</span>원
             </div>
             <div style="font-size: 14px; color: #8B95A1; margin-bottom: 10px;">
                 (세전 연간 총 <span id="resAnnualDiv">0</span>원)
@@ -175,12 +158,12 @@
                     연간 <span id="resAnnualAfterTax">0</span>원
                 </div>
                 <div style="font-size: 14px; color: #6B7684; margin-top: 4px;">
-                    (월 약 <span style="color: #00C851; font-weight: 700;" id="resMonthlyAfterTax">0</span>원 들어와요)
+                    (월 평균 <span style="color: #00C851; font-weight: 700;" id="resMonthlyAfterTax">0</span>원 수령)
                 </div>
             </div>
 
             <p style="margin:15px 0 0 0; color:#6b7684; font-size: 13px; background-color: #f2f4f6; padding: 10px; border-radius: 8px;">
-                💡 입력하신 배당률 <span id="displayYield" style="font-weight:bold;">3.5%</span> 기준입니다.
+                💡 <span id="yieldSourceText">입력하신</span> 배당률 <span id="displayYield" style="font-weight:bold;">3.5%</span> 기준입니다.
             </p>
 
             <div style="height: 250px; margin-top: 20px;">
@@ -208,31 +191,31 @@
 
 <script>
     let API_KEY = "";
-    if (typeof SECRET_KEY !== 'undefined') {
-        API_KEY = SECRET_KEY;
-    } else {
-        API_KEY = "여기에_API_키를_직접_넣으세요";
-    }
+    if (typeof SECRET_KEY !== 'undefined') { API_KEY = SECRET_KEY; }
+    else { API_KEY = "apiiiiiiiii"; }
 
+    // ⭐ [중요] 배당 월 정보(payMonths) 추가!
+    // 0 = 월배당 (모든 달)
+    // [3,6,9,12] = 분기배당
     const STOCK_DATA = {
-        'TSLA': { yield: 0, name: 'Tesla (테슬라)' },
-        'AAPL': { yield: 0.5, name: 'Apple (애플)' },
-        'MSFT': { yield: 0.7, name: 'Microsoft (마이크로소프트)' },
-        'NVDA': { yield: 0.03, name: 'NVIDIA (엔비디아)' },
-        'AMZN': { yield: 0, name: 'Amazon (아마존)' },
-        'GOOGL': { yield: 0, name: 'Alphabet (구글)' },
-        'O': { yield: 5.2, name: 'Realty Income (리얼티인컴)' },
-        'SCHD': { yield: 3.4, name: 'Schwab Dividend (슈드)' },
-        'JEPI': { yield: 7.5, name: 'JPMorgan Premium (제피)' },
-        'T': { yield: 6.5, name: 'AT&T' },
-        'KO': { yield: 3.1, name: 'Coca-Cola (코카콜라)' },
-        'SBUX': { yield: 2.5, name: 'Starbucks (스타벅스)' },
-        '005930': { yield: 2.0, name: '삼성전자' },
-        '005380': { yield: 4.5, name: '현대차' },
-        '000660': { yield: 1.5, name: 'SK하이닉스' },
-        '035420': { yield: 0, name: 'NAVER' },
-        '005490': { yield: 1.8, name: 'POSCO홀딩스' },
-        '105560': { yield: 5.0, name: 'KB금융' }
+        'TSLA': { yield: 0, name: 'Tesla (테슬라)', payMonths: [] },
+        'AAPL': { yield: 0.5, name: 'Apple (애플)', payMonths: [2, 5, 8, 11] },
+        'MSFT': { yield: 0.7, name: 'Microsoft', payMonths: [3, 6, 9, 12] },
+        'NVDA': { yield: 0.03, name: 'NVIDIA', payMonths: [3, 6, 9, 12] },
+        'AMZN': { yield: 0, name: 'Amazon', payMonths: [] },
+        'GOOGL': { yield: 0, name: 'Alphabet', payMonths: [] },
+
+        'O': { yield: 5.2, name: 'Realty Income (리얼티인컴)', payMonths: 0 }, // 0은 월배당
+        'SCHD': { yield: 3.4, name: 'Schwab Dividend (슈드)', payMonths: [3, 6, 9, 12] },
+        'JEPI': { yield: 7.5, name: 'JPMorgan Premium (제피)', payMonths: 0 },
+        'T': { yield: 6.5, name: 'AT&T', payMonths: [2, 5, 8, 11] },
+        'KO': { yield: 3.1, name: 'Coca-Cola', payMonths: [4, 7, 10, 12] },
+        'SBUX': { yield: 2.5, name: 'Starbucks', payMonths: [2, 5, 8, 11] },
+
+        '005930': { yield: 2.0, name: '삼성전자', payMonths: [4, 5, 8, 11] },
+        '005380': { yield: 4.5, name: '현대차', payMonths: [4, 6] },
+        '000660': { yield: 1.5, name: 'SK하이닉스', payMonths: [4] },
+        '105560': { yield: 5.0, name: 'KB금융', payMonths: [4, 5, 8, 11] }
     };
 
     let myChart = null;
@@ -252,46 +235,31 @@
 
         for (const ticker in STOCK_DATA) {
             const stockName = STOCK_DATA[ticker].name.toUpperCase();
-
             if (ticker.includes(query) || stockName.includes(query)) {
                 const div = document.createElement("div");
                 div.className = "suggestion-item";
                 div.innerHTML = `<span>${STOCK_DATA[ticker].name}</span> <span class="code-badge">${ticker}</span>`;
-                div.onclick = function() {
-                    selectStock(ticker);
-                };
+                div.onclick = function() { selectStock(ticker); };
                 suggestionsBox.appendChild(div);
                 matchCount++;
             }
         }
-
-        if (matchCount > 0) {
-            suggestionsBox.style.display = "block";
-        } else {
-            suggestionsBox.style.display = "none";
-        }
+        suggestionsBox.style.display = matchCount > 0 ? "block" : "none";
     }
 
     function selectStock(ticker) {
         document.getElementById('inputTicker').value = ticker;
-
         if (STOCK_DATA[ticker]) {
             document.getElementById('inputYield').value = STOCK_DATA[ticker].yield;
         }
-
         document.getElementById('suggestions').style.display = "none";
     }
 
-    function checkEnter(event) {
-        if (event.key === 'Enter') calculateDividend();
-    }
-
+    function checkEnter(event) { if (event.key === 'Enter') calculateDividend(); }
     document.addEventListener('click', function(e) {
         const box = document.getElementById('suggestions');
         const input = document.getElementById('inputTicker');
-        if (e.target !== box && e.target !== input) {
-            box.style.display = "none";
-        }
+        if (e.target !== box && e.target !== input) box.style.display = "none";
     });
 
     async function getExchangeRate() {
@@ -321,13 +289,12 @@
         const quantity = parseFloat(document.getElementById('inputQuantity').value);
         let userYield = parseFloat(document.getElementById('inputYield').value);
 
-        if (!ticker || !quantity) {
-            alert("종목과 수량을 입력해주세요!");
-            return;
-        }
+        if (!ticker || !quantity) { alert("종목과 수량을 입력해주세요!"); return; }
 
-        if (STOCK_DATA[ticker] && document.getElementById('inputYield').value == "3.5") {
-            userYield = STOCK_DATA[ticker].yield;
+        let stockInfo = STOCK_DATA[ticker]; // 족보 정보 가져오기
+
+        if (stockInfo && document.getElementById('inputYield').value == "3.5") {
+            userYield = stockInfo.yield;
             document.getElementById('inputYield').value = userYield;
         }
 
@@ -350,19 +317,24 @@
             const priceKRW = isKoreanStock ? priceUSD : Math.round(priceUSD * exchangeRate);
             const totalAssetKRW = priceKRW * quantity;
             const annualDividendKRW = Math.round(totalAssetKRW * (userYield / 100));
-            const monthlyDividendKRW = Math.round(annualDividendKRW / 12);
-            const taxInfo = calculateTax(annualDividendKRW, isKoreanStock);
 
-            const companyName = STOCK_DATA[ticker] ? STOCK_DATA[ticker].name : ticker;
+            // 월 평균은 그냥 / 12 (사용자 참고용)
+            const monthlyAvgKRW = Math.round(annualDividendKRW / 12);
+
+            const taxInfo = calculateTax(annualDividendKRW, isKoreanStock);
+            const monthlyAfterTaxAvg = Math.round(taxInfo.afterTax / 12);
+
+            const companyName = stockInfo ? stockInfo.name : ticker;
             document.getElementById('resCompanyName').innerText = companyName;
             document.getElementById('resPrice').innerText = '₩' + priceKRW.toLocaleString();
             document.getElementById('resTotalAsset').innerText = '₩' + totalAssetKRW.toLocaleString();
-            document.getElementById('resMonthlyDiv').innerText = monthlyDividendKRW.toLocaleString();
+            document.getElementById('resMonthlyDiv').innerText = monthlyAvgKRW.toLocaleString();
             document.getElementById('resAnnualDiv').innerText = annualDividendKRW.toLocaleString();
             document.getElementById('taxRate').innerText = taxInfo.rate;
             document.getElementById('resAnnualAfterTax').innerText = taxInfo.afterTax.toLocaleString();
-            document.getElementById('resMonthlyAfterTax').innerText = Math.round(taxInfo.afterTax / 12).toLocaleString();
+            document.getElementById('resMonthlyAfterTax').innerText = monthlyAfterTaxAvg.toLocaleString();
             document.getElementById('displayYield').innerText = userYield + "%";
+            document.getElementById('yieldSourceText').innerText = stockInfo ? "자동 감지된" : "입력하신";
 
             const resultBox = document.getElementById('resultBox');
             resultBox.style.display = 'block';
@@ -375,32 +347,57 @@
             document.activeElement.blur();
             resultBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-            drawChart(Math.round(taxInfo.afterTax / 12));
+            // 👇 차트 그리기 (배당 월 정보 넘기기)
+            // 족보에 없는 종목이면 기본값(월배당처럼) 처리
+            const payMonths = stockInfo ? stockInfo.payMonths : 0;
+            drawChart(taxInfo.afterTax, payMonths);
 
         } catch (error) {
             console.error(error);
-            alert("⚠️ 에러가 발생했습니다. (API 키 확인 필요)");
+            alert("⚠️ 에러가 발생했습니다.");
         } finally {
             showLoading(false);
         }
     }
 
-    function savePortfolio() {
-        alert("🚧 아직 데이터베이스 연결 전입니다!");
-    }
+    function savePortfolio() { alert("🚧 아직 데이터베이스 연결 전입니다!"); }
 
-    function drawChart(monthlyAmount) {
+    // ⭐ [핵심] 차트 그리기 로직 업그레이드
+    function drawChart(annualAfterTax, payMonths) {
         const ctx = document.getElementById('dividendChart');
         if (myChart) myChart.destroy();
-        const chartData = Array(12).fill(monthlyAmount);
+
+        let chartData = [];
+
+        if (payMonths === 0) {
+            // 0이면 매달 균등하게 (월배당)
+            const monthlyAmount = Math.round(annualAfterTax / 12);
+            chartData = Array(12).fill(monthlyAmount);
+        } else if (Array.isArray(payMonths) && payMonths.length > 0) {
+            // 특정 월에만 지급 (분기/반기 배당)
+            // payMonths는 [3, 6, 9, 12] 형태
+            chartData = Array(12).fill(0); // 일단 다 0원으로 채움
+
+            // 지급 횟수로 나누기
+            const amountPerPayment = Math.round(annualAfterTax / payMonths.length);
+
+            payMonths.forEach(month => {
+                // 배열 인덱스는 0부터 시작하니까 month - 1
+                chartData[month - 1] = amountPerPayment;
+            });
+        } else {
+            // 정보 없으면 그냥 매달 주는 걸로 가정
+            chartData = Array(12).fill(Math.round(annualAfterTax / 12));
+        }
+
         myChart = new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
                 datasets: [{
-                    label: '예상 실수령액 (원)',
+                    label: '예상 수령액 (원)',
                     data: chartData,
-                    backgroundColor: '#3182F6',
+                    backgroundColor: '#00C851', // 민트색 (돈!)
                     borderRadius: 8,
                     barThickness: 16
                 }]
