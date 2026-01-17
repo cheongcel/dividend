@@ -26,7 +26,6 @@
         .nav-menu a:hover { color: #3182F6; }
         .container { max-width: 600px; margin: 40px auto; padding: 0 20px; }
 
-        /* 애니메이션 */
         .card {
             background: white; padding: 30px; border-radius: 20px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.05);
@@ -39,7 +38,6 @@
         label { display: block; font-weight: 600; color: #4E5968;
             margin-bottom: 8px; font-size: 14px; }
 
-        /* 입력창 스타일 */
         input { width: 100%; padding: 15px; border: 1px solid #E5E8EB;
             border-radius: 12px; font-size: 16px; outline: none;
             transition: 0.2s; box-sizing: border-box; }
@@ -51,9 +49,9 @@
             font-size: 16px; font-weight: 700; cursor: pointer;
             transition: 0.2s; margin-top: 10px; }
         button:hover { background-color: #2563EB; }
+        button:disabled { background-color: #B0B8C1; cursor: not-allowed; }
 
         .result-box { margin-top: 30px; display: none; }
-
         .result-card {
             background: white; padding: 25px; border-radius: 20px;
             text-align: center; border: 2px solid #E5E8EB;
@@ -66,6 +64,26 @@
         }
 
         .mint-text { color: #00D09E !important; }
+
+        /* 👇 은지 님이 추가한 세금 정보 박스 (디자인 굿!) */
+        .tax-info {
+            background: #FFF9E6;
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 15px;
+            border: 1px solid #FFE082; /* 테두리 추가해서 더 깔끔하게 */
+        }
+        .tax-label {
+            font-size: 13px; /* 글씨 살짝 키움 */
+            color: #B8860B;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        .tax-amount {
+            font-size: 20px; /* 금액 더 크게 강조 */
+            font-weight: 800;
+            color: #FF8C00; /* 세후 금액은 주황색 계열로 차별화 (민트는 자산) */
+        }
 
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(30px); }
@@ -95,21 +113,29 @@
     <div class="card">
         <div class="form-group">
             <label>종목 (티커)</label>
-            <input type="text" id="inputTicker" placeholder="예: AAPL, O, TSLA" style="text-transform: uppercase;">
+            <input type="text" id="inputTicker"
+                   placeholder="예: AAPL, O, 005930"
+                   style="text-transform: uppercase;" onkeypress="checkEnter(event)">
+            <small style="color: #8B95A1; font-size: 13px; margin-top: 4px; display:block;">
+                💡 한국 주식은 6자리 숫자만 입력 (예: 005930)
+            </small>
         </div>
 
         <div style="display: flex; gap: 15px;">
             <div class="form-group" style="flex: 1;">
                 <label>보유 수량 (주)</label>
-                <input type="number" id="inputQuantity" placeholder="1" value="1">
+                <input type="number" id="inputQuantity" placeholder="1" value="1" onkeypress="checkEnter(event)">
             </div>
             <div class="form-group" style="flex: 1;">
                 <label>배당률 (%)</label>
-                <input type="number" id="inputYield" placeholder="3.5" value="3.5" step="0.1">
+                <input type="number" id="inputYield" placeholder="3.5" value="3.5" step="0.1" onkeypress="checkEnter(event)">
             </div>
         </div>
 
-        <button type="button" onclick="calculateDividend()">계산하기</button>
+        <button type="button" id="calcBtn" onclick="calculateDividend()">
+            <span id="btnText">계산하기</span>
+            <span id="btnLoader" style="display:none;">⏳ 조회 및 계산 중...</span>
+        </button>
     </div>
 
     <div id="resultBox" class="result-box">
@@ -117,15 +143,26 @@
             <div style="font-size: 15px; color: #8B95A1; font-weight: 500; margin-bottom: 2px;">
                 <span id="resCompanyName">Apple Inc.</span>
             </div>
+
             <div class="dividend-amount">
                 월 약 <span id="resMonthlyDiv">0</span>원
             </div>
-            <div style="font-size: 14px; color: #8B95A1; margin-bottom: 20px;">
-                (연간 총 배당금: <span id="resAnnualDiv">0</span>원)
+            <div style="font-size: 14px; color: #8B95A1; margin-bottom: 10px;">
+                (세전 연간 총 <span id="resAnnualDiv">0</span>원)
             </div>
 
-            <p style="margin:0; color:#6b7684; font-size: 13px; background-color: #f2f4f6; padding: 10px; border-radius: 8px;">
-                💡 입력하신 배당률 <span id="displayYield" style="font-weight:bold;">3.5%</span> 기준으로 계산되었습니다.
+            <div class="tax-info">
+                <div class="tax-label">💰 세후 실수령액 (세금 <span id="taxRate">15%</span> 제외)</div>
+                <div class="tax-amount">
+                    연간 <span id="resAnnualAfterTax">0</span>원
+                </div>
+                <div style="font-size: 14px; color: #B8860B; margin-top: 4px;">
+                    (월 약 <span id="resMonthlyAfterTax">0</span>원 들어와요)
+                </div>
+            </div>
+
+            <p style="margin:15px 0 0 0; color:#6b7684; font-size: 13px; background-color: #f2f4f6; padding: 10px; border-radius: 8px;">
+                💡 입력하신 배당률 <span id="displayYield" style="font-weight:bold;">3.5%</span> 기준입니다.
             </p>
 
             <div style="height: 250px; margin-top: 20px;">
@@ -135,12 +172,12 @@
             <div style="background-color: #F9FAFB; border-radius: 12px; padding: 20px; margin-top: 15px; display: flex; justify-content: space-between; align-items: center;">
                 <div style="text-align: left;">
                     <span style="color: #6B7684; font-size: 13px; font-weight: 500;">현재 1주 가격</span><br>
-                    <span id="resPrice" class="mint-text" style="font-size: 18px; font-weight: 700;">$0.00</span>
+                    <span id="resPrice" class="mint-text" style="font-size: 18px; font-weight: 700;">₩0</span>
                 </div>
                 <div style="width: 1px; height: 40px; background-color: #E5E8EB;"></div>
                 <div style="text-align: right;">
                     <span style="color: #6B7684; font-size: 13px; font-weight: 500;">총 자산 평가액</span><br>
-                    <span id="resTotalAsset" class="mint-text" style="font-size: 18px; font-weight: 700;">$0.00</span>
+                    <span id="resTotalAsset" class="mint-text" style="font-size: 18px; font-weight: 700;">₩0</span>
                 </div>
             </div>
 
@@ -153,72 +190,160 @@
 </div>
 
 <script>
-    // 👇👇 여기에 API 키 넣으세요 👇👇
-    const API_KEY = "14cb1fea7b5043d0b4664ea7cae29214";
-
+    // ⭐ 경고: 실제 서비스할 땐 이 키를 서버에 숨겨야 합니다!
+    const API_KEY = ",,,,,,,,,,api";
     let myChart = null;
 
-    async function calculateDividend() {
-        const ticker = document.getElementById('inputTicker').value.toUpperCase();
-        const quantity = parseFloat(document.getElementById('inputQuantity').value);
-        // 👇 사용자가 입력한 배당률 가져오기
-        const userYield = parseFloat(document.getElementById('inputYield').value);
-        const btn = document.querySelector('button');
+    // 💡 인기 종목 족보 (이것도 유지)
+    const STOCK_DATA = {
+        'TSLA': { yield: 0, name: 'Tesla Inc' },
+        'O': { yield: 5.2, name: 'Realty Income' },
+        'SCHD': { yield: 3.4, name: 'Schwab US Dividend' },
+        'JEPI': { yield: 7.5, name: 'JPMorgan Premium' },
+        'AAPL': { yield: 0.5, name: 'Apple Inc' },
+        'MSFT': { yield: 0.7, name: 'Microsoft' },
+        'NVDA': { yield: 0.03, name: 'NVIDIA' },
+        '005930': { yield: 2.0, name: '삼성전자' }, // 한국 주식 예시
+        '005380': { yield: 4.5, name: '현대차' }
+    };
 
-        if (!ticker || !quantity || !userYield) {
-            alert("종목, 수량, 배당률을 모두 입력해주세요!");
+    function checkEnter(event) {
+        if (event.key === 'Enter') calculateDividend();
+    }
+
+    // 실시간 환율 조회
+    async function getExchangeRate() {
+        try {
+            const res = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+            const data = await res.json();
+            return data.rates.KRW;
+        } catch {
+            return 1450; // 실패 시 안전장치
+        }
+    }
+
+    // 세금 계산 (미국 15%, 한국 15.4%)
+    function calculateTax(dividend, isKorean) {
+        const taxRate = isKorean ? 0.154 : 0.15; // 27% -> 15%로 수정!
+        const tax = Math.round(dividend * taxRate);
+        const afterTax = dividend - tax;
+
+        return {
+            tax,
+            afterTax,
+            rate: isKorean ? '15.4%' : '15%'
+        };
+    }
+
+    // 로딩 상태 제어
+    function showLoading(isLoading) {
+        const btn = document.getElementById('calcBtn');
+        document.getElementById('btnText').style.display = isLoading ? 'none' : 'inline';
+        document.getElementById('btnLoader').style.display = isLoading ? 'inline' : 'none';
+        btn.disabled = isLoading; // 로딩 중 버튼 비활성화 (중복 클릭 방지)
+    }
+
+    async function calculateDividend() {
+        const tickerInput = document.getElementById('inputTicker');
+        const ticker = tickerInput.value.trim().toUpperCase();
+        const quantity = parseFloat(document.getElementById('inputQuantity').value);
+        let userYield = parseFloat(document.getElementById('inputYield').value);
+
+        if (!ticker || !quantity) {
+            alert("종목과 수량을 입력해주세요!");
             return;
         }
 
-        const originalText = btn.innerText;
-        당률 계산 조정  btn.innerText = "가격 조회 중...";
+        // 족보에 있으면 배당률 자동 입력
+        if (STOCK_DATA[ticker]) {
+            // 사용자가 건드리지 않았을 때만 자동 변경
+            if(document.getElementById('inputYield').value == "3.5") {
+                userYield = STOCK_DATA[ticker].yield;
+                document.getElementById('inputYield').value = userYield;
+            }
+        }
+
+        showLoading(true);
 
         try {
-            const response = await fetch(`https://api.twelvedata.com/price?symbol=${ticker}&apikey=${API_KEY}`);
+            // 한국 주식 감지 (6자리 숫자)
+            const isKoreanStock = /^\d{6}$/.test(ticker);
+            // 한국 주식이면 .KS 붙임 (API 요구사항)
+            const finalTicker = isKoreanStock ? ticker + ".KS" : ticker;
+
+            // 실시간 환율
+            const exchangeRate = await getExchangeRate();
+            console.log('📊 현재 환율:', exchangeRate);
+
+            // 주가 조회
+            const response = await fetch(`https://api.twelvedata.com/price?symbol=${finalTicker}&apikey=${API_KEY}`);
             const data = await response.json();
 
             if (!data.price) {
-                alert("가격을 가져올 수 없어요. 티커를 확인해주세요!");
-                btn.innerText = originalText;
+                alert("❌ 존재하지 않는 종목입니다!\n(미국: AAPL / 한국: 005930)");
                 return;
             }
 
-            const price = parseFloat(data.price);
-            const exchangeRate = 1350;
-            const totalAssetUSD = price * quantity;
+            const priceUSD = parseFloat(data.price);
+            // 한국 주식은 API가 원화(KRW)로 줄 때가 많음, 미국은 달러(USD)
+            // Twelve Data는 보통 .KS 종목도 원화로 줌.
+            const priceKRW = isKoreanStock ? priceUSD : Math.round(priceUSD * exchangeRate);
 
-            // ⭐ [핵심] 사용자가 입력한 배당률(%)로 계산
-            const annualDividendUSD = totalAssetUSD * (userYield / 100);
+            // 배당금 계산
+            const totalAssetKRW = priceKRW * quantity;
+            const annualDividendKRW = Math.round(totalAssetKRW * (userYield / 100));
+            const monthlyDividendKRW = Math.round(annualDividendKRW / 12);
 
-            const monthlyDividendKRW = (annualDividendUSD / 12) * exchangeRate;
-            const annualDividendKRW = annualDividendUSD * exchangeRate;
+            // 세금 계산
+            const taxInfo = calculateTax(annualDividendKRW, isKoreanStock);
 
-            document.getElementById('resCompanyName').innerText = ticker + " (미국 주식)";
-            document.getElementById('resPrice').innerText = "$" + price.toFixed(2);
-            document.getElementById('resTotalAsset').innerText = "$" + totalAssetUSD.toLocaleString(undefined, {minimumFractionDigits: 2});
-            document.getElementById('resMonthlyDiv').innerText = Math.round(monthlyDividendKRW).toLocaleString();
-            document.getElementById('resAnnualDiv').innerText = Math.round(annualDividendKRW).toLocaleString();
+            // 화면 업데이트
+            const companyName = STOCK_DATA[ticker] ? STOCK_DATA[ticker].name : ticker;
+            document.getElementById('resCompanyName').innerText =
+                companyName + (isKoreanStock ? ' (한국 주식)' : ' (미국 주식)');
+
+            document.getElementById('resPrice').innerText = '₩' + priceKRW.toLocaleString();
+            document.getElementById('resTotalAsset').innerText = '₩' + totalAssetKRW.toLocaleString();
+
+            document.getElementById('resMonthlyDiv').innerText = monthlyDividendKRW.toLocaleString();
+            document.getElementById('resAnnualDiv').innerText = annualDividendKRW.toLocaleString();
+
+            // 세금 정보 표시
+            document.getElementById('taxRate').innerText = taxInfo.rate;
+            document.getElementById('resAnnualAfterTax').innerText = taxInfo.afterTax.toLocaleString();
+            document.getElementById('resMonthlyAfterTax').innerText = Math.round(taxInfo.afterTax / 12).toLocaleString();
+
             document.getElementById('displayYield').innerText = userYield + "%";
 
+            // 결과 표시 & 스크롤 이동
             const resultBox = document.getElementById('resultBox');
             resultBox.style.display = 'block';
 
+            // 애니메이션 재실행
             const resultCard = resultBox.querySelector('.result-card');
             resultCard.style.animation = 'none';
             resultCard.offsetHeight;
             resultCard.style.animation = 'fadeInUp 0.6s ease-out';
 
-            drawChart(monthlyDividendKRW);
+            // 모바일에서 키패드 내려가게 하기
+            document.activeElement.blur();
+            resultBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            // 차트 (세후 금액으로 그려주는 게 더 현실적이라 변경함!)
+            drawChart(Math.round(taxInfo.afterTax / 12));
 
         } catch (error) {
             console.error(error);
-            alert("에러가 발생했습니다.");
+            let errorMsg = "에러가 발생했습니다.";
+            if (error.message && error.message.includes('429')) {
+                errorMsg = "⏱️ 너무 많이 조회했어요! 1분만 쉬었다 해주세요.";
+            }
+            alert(errorMsg);
         } finally {
-            btn.innerText = originalText;
+            showLoading(false);
         }
     }
 
-    // 저장 버튼 기능 (임시)
     function savePortfolio() {
         alert("🚧 아직 데이터베이스 연결 전입니다!\n(다음 단계: 로그인 & DB 구현)");
     }
@@ -226,26 +351,41 @@
     function drawChart(monthlyAmount) {
         const ctx = document.getElementById('dividendChart');
         if (myChart) myChart.destroy();
-        const chartData = Array(12).fill(Math.round(monthlyAmount));
+
+        const chartData = Array(12).fill(monthlyAmount);
 
         myChart = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+                labels: ['1월', '2월', '3월', '4월', '5월', '6월',
+                    '7월', '8월', '9월', '10월', '11월', '12월'],
                 datasets: [{
-                    label: '예상 배당금 (원)',
+                    label: '예상 실수령액 (원)', // 라벨 수정
                     data: chartData,
                     backgroundColor: '#3182F6',
-                    borderRadius: 6,
-                    barThickness: 12
+                    borderRadius: 8,
+                    barThickness: 16
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: (context) => context.parsed.y.toLocaleString() + '원'
+                        }
+                    }
+                },
                 scales: {
-                    y: { beginAtZero: true, grid: { display: false } },
+                    y: {
+                        beginAtZero: true,
+                        grid: { display: false },
+                        ticks: {
+                            callback: (value) => value.toLocaleString() + '원'
+                        }
+                    },
                     x: { grid: { display: false } }
                 }
             }
