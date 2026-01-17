@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="ko">
 <head>
     <link rel="icon" href="/images/favicon.png">
     <meta charset="UTF-8">
@@ -25,65 +25,60 @@
             font-size: 14px; transition: color 0.2s; }
         .nav-menu a:hover { color: #3182F6; }
         .container { max-width: 600px; margin: 40px auto; padding: 0 20px; }
-        .card { background: white; padding: 30px; border-radius: 20px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+
+        /* 애니메이션 */
+        .card {
+            background: white; padding: 30px; border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            animation: fadeInUp 0.8s ease-out backwards;
+            animation-delay: 0.1s;
+        }
+        h2 { animation: fadeInUp 0.8s ease-out; }
+
         .form-group { margin-bottom: 20px; position: relative; }
         label { display: block; font-weight: 600; color: #4E5968;
             margin-bottom: 8px; font-size: 14px; }
+
+        /* 입력창 스타일 */
         input { width: 100%; padding: 15px; border: 1px solid #E5E8EB;
             border-radius: 12px; font-size: 16px; outline: none;
             transition: 0.2s; box-sizing: border-box; }
         input:focus { border-color: #3182F6;
             box-shadow: 0 0 0 2px rgba(49, 130, 246, 0.1); }
+
         button { width: 100%; padding: 18px; background-color: #3182F6;
             color: white; border: none; border-radius: 12px;
             font-size: 16px; font-weight: 700; cursor: pointer;
             transition: 0.2s; margin-top: 10px; }
         button:hover { background-color: #2563EB; }
 
-        /* 자동완성 */
-        .suggestions-list {
-            position: absolute; top: 100%; left: 0; width: 100%;
-            background: white; border: 1px solid #E5E8EB;
-            border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            z-index: 1000; max-height: 250px; overflow-y: auto;
-            display: none;
-        }
-        .suggestion-item {
-            padding: 12px 15px; cursor: pointer;
-            border-bottom: 1px solid #f2f2f2; font-size: 15px;
-            display: flex; justify-content: space-between;
-        }
-        .suggestion-item:hover {
-            background-color: #F2F4F6; color: #3182F6;
-        }
-        .code-badge {
-            font-size: 12px; color: #8B95A1; background: #f2f4f6;
-            padding: 2px 6px; border-radius: 4px;
-        }
+        .result-box { margin-top: 30px; display: none; }
 
-        /* 결과 박스 스타일 */
-        .result-box { margin-top: 30px; animation: slideUp 0.5s ease-out; }
         .result-card {
             background: white; padding: 25px; border-radius: 20px;
             text-align: center; border: 2px solid #E5E8EB;
+            animation: fadeInUp 0.6s ease-out;
         }
+
         .dividend-amount {
             font-size: 32px; font-weight: 800; color: #3182F6;
             margin: 5px 0;
         }
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
+
+        .mint-text { color: #00D09E !important; }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 <body>
+
 <nav class="navbar">
     <div class="nav-container">
         <a href="/" class="nav-brand" style="display: flex; align-items: center; text-decoration: none;">
             <img src="/images/favicon.png" alt="DIVY" style="height: 33px;">
-
             <span style="font-size: 25px; font-weight: 300; color: #3182F6;">DIVY</span>
         </a>
         <div class="nav-menu">
@@ -96,43 +91,41 @@
 
 <div class="container">
     <h2>배당금 계산기 🧮</h2>
+
     <div class="card">
-        <form action="/calculate" method="post" autocomplete="off">
-            <div class="form-group">
-                <label>종목 검색</label>
-                <input type="text" id="searchInput"
-                       placeholder="예: 삼성전자, Apple"
-                       onkeyup="filterStocks()" required>
-                <input type="hidden" id="tickerInput" name="ticker">
-                <div id="suggestions" class="suggestions-list"></div>
+        <div class="form-group">
+            <label>종목 (티커)</label>
+            <input type="text" id="inputTicker" placeholder="예: AAPL, O, TSLA" style="text-transform: uppercase;">
+        </div>
+
+        <div style="display: flex; gap: 15px;">
+            <div class="form-group" style="flex: 1;">
+                <label>보유 수량 (주)</label>
+                <input type="number" id="inputQuantity" placeholder="1" value="1">
             </div>
-            <div class="form-group">
-                <label>보유 수량</label>
-                <input type="number" name="quantity"
-                       placeholder="몇 주?" required>
+            <div class="form-group" style="flex: 1;">
+                <label>배당률 (%)</label>
+                <input type="number" id="inputYield" placeholder="3.5" value="3.5" step="0.1">
             </div>
-            <button type="submit">계산하기</button>
-        </form>
+        </div>
+
+        <button type="button" onclick="calculateDividend()">계산하기</button>
     </div>
 
-    <div class="result-box" th:if="${result != null}">
+    <div id="resultBox" class="result-box">
         <div class="result-card">
-
             <div style="font-size: 15px; color: #8B95A1; font-weight: 500; margin-bottom: 2px;">
-                <span th:text="${result.companyName}">Apple Inc.</span>
+                <span id="resCompanyName">Apple Inc.</span>
             </div>
-
-            <div class="dividend-amount"
-                 th:text="'월 약 ' + ${#numbers.formatInteger(result.dividendAmount, 0, 'COMMA')} + '원'">
-                월 약 10,000원
+            <div class="dividend-amount">
+                월 약 <span id="resMonthlyDiv">0</span>원
             </div>
-
             <div style="font-size: 14px; color: #8B95A1; margin-bottom: 20px;">
-                (연간 총 배당금: <span th:text="${#numbers.formatInteger(result.totalAnnualDividend, 0, 'COMMA')}">120,000</span>원)
+                (연간 총 배당금: <span id="resAnnualDiv">0</span>원)
             </div>
 
             <p style="margin:0; color:#6b7684; font-size: 13px; background-color: #f2f4f6; padding: 10px; border-radius: 8px;">
-                💡 실제로는 <span style="font-weight:bold;">그래프에 표시된 달</span>에만 입금돼요!
+                💡 입력하신 배당률 <span id="displayYield" style="font-weight:bold;">3.5%</span> 기준으로 계산되었습니다.
             </p>
 
             <div style="height: 250px; margin-top: 20px;">
@@ -140,138 +133,124 @@
             </div>
 
             <div style="background-color: #F9FAFB; border-radius: 12px; padding: 20px; margin-top: 15px; display: flex; justify-content: space-between; align-items: center;">
-
                 <div style="text-align: left;">
                     <span style="color: #6B7684; font-size: 13px; font-weight: 500;">현재 1주 가격</span><br>
-                    <span style="font-size: 18px; font-weight: 700; color: #333;"
-                          th:text="${#numbers.formatInteger(result.price, 0, 'COMMA')} + '원'">50,000원</span>
+                    <span id="resPrice" class="mint-text" style="font-size: 18px; font-weight: 700;">$0.00</span>
                 </div>
-
                 <div style="width: 1px; height: 40px; background-color: #E5E8EB;"></div>
-
                 <div style="text-align: right;">
-                    <span style="color: #6B7684; font-size: 13px; font-weight: 500;">연간 총 배당금</span><br>
-                    <span style="font-size: 18px; font-weight: 700; color: #3182F6;"
-                          th:text="${#numbers.formatInteger(result.totalAnnualDividend, 0, 'COMMA')} + '원'">120,000원</span>
+                    <span style="color: #6B7684; font-size: 13px; font-weight: 500;">총 자산 평가액</span><br>
+                    <span id="resTotalAsset" class="mint-text" style="font-size: 18px; font-weight: 700;">$0.00</span>
                 </div>
             </div>
 
-            <form th:if="${result != null}" action="/add" method="post" style="margin-top: 20px;">
-                <input type="hidden" name="ticker" th:value="${searchTicker}">
-                <input type="hidden" name="quantity" th:value="${searchQuantity}">
-
-                <button type="submit"
-                        style="width: 100%; padding: 18px; background-color: #3182F6; color: white;
-                               border: none; border-radius: 12px; font-size: 16px; font-weight: 700;
-                               cursor: pointer; transition: background-color 0.2s;">
-                    📂 내 포트폴리오에 저장하기
-                </button>
-                <style>
-                    form button[type="submit"]:hover { background-color: #2563EB !important; }
-                </style>
-            </form>
-
-        </div> </div> <div th:if="${error != null}"
-                           style="color: red; text-align: center; margin-top: 20px;"
-                           th:text="${error}"></div>
+            <button type="button" onclick="savePortfolio()"
+                    style="width: 100%; padding: 18px; background-color: #3182F6; color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; transition: background-color 0.2s; margin-top: 20px;">
+                📂 내 포트폴리오에 저장하기
+            </button>
+        </div>
+    </div>
 </div>
 
-<script th:inline="javascript">
-    const searchInput = document.getElementById("searchInput");
-    const tickerInput = document.getElementById("tickerInput");
-    const suggestionsBox = document.getElementById("suggestions");
+<script>
+    // 👇👇 여기에 API 키 넣으세요 👇👇
+    const API_KEY = "14cb1fea7b5043d0b4664ea7cae29214";
 
-    function filterStocks() {
-        const query = searchInput.value;
-        if (query.length < 1) {
-            suggestionsBox.style.display = "none";
+    let myChart = null;
+
+    async function calculateDividend() {
+        const ticker = document.getElementById('inputTicker').value.toUpperCase();
+        const quantity = parseFloat(document.getElementById('inputQuantity').value);
+        // 👇 사용자가 입력한 배당률 가져오기
+        const userYield = parseFloat(document.getElementById('inputYield').value);
+        const btn = document.querySelector('button');
+
+        if (!ticker || !quantity || !userYield) {
+            alert("종목, 수량, 배당률을 모두 입력해주세요!");
             return;
         }
 
-        fetch('/api/autocomplete?keyword=' + query)
-            .then(response => response.json())
-            .then(data => {
-                suggestionsBox.innerHTML = "";
-                if (data.length > 0) {
-                    suggestionsBox.style.display = "block";
-                    data.forEach(stock => {
-                        const div = document.createElement("div");
-                        div.className = "suggestion-item";
-                        div.innerHTML = `<span>${stock.name}</span> <span class="code-badge">${stock.ticker}</span>`;
-                        div.onclick = () => selectStock(stock);
-                        suggestionsBox.appendChild(div);
-                    });
-                } else {
-                    suggestionsBox.style.display = "none";
-                }
-            })
-            .catch(err => console.error("Error:", err));
-    }
+        const originalText = btn.innerText;
+        당률 계산 조정  btn.innerText = "가격 조회 중...";
 
-    function selectStock(stock) {
-        searchInput.value = stock.name;
-        tickerInput.value = stock.ticker;
-        suggestionsBox.style.display = "none";
-    }
+        try {
+            const response = await fetch(`https://api.twelvedata.com/price?symbol=${ticker}&apikey=${API_KEY}`);
+            const data = await response.json();
 
-    document.addEventListener('click', function(e) {
-        if (!searchInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
-            suggestionsBox.style.display = "none";
+            if (!data.price) {
+                alert("가격을 가져올 수 없어요. 티커를 확인해주세요!");
+                btn.innerText = originalText;
+                return;
+            }
+
+            const price = parseFloat(data.price);
+            const exchangeRate = 1350;
+            const totalAssetUSD = price * quantity;
+
+            // ⭐ [핵심] 사용자가 입력한 배당률(%)로 계산
+            const annualDividendUSD = totalAssetUSD * (userYield / 100);
+
+            const monthlyDividendKRW = (annualDividendUSD / 12) * exchangeRate;
+            const annualDividendKRW = annualDividendUSD * exchangeRate;
+
+            document.getElementById('resCompanyName').innerText = ticker + " (미국 주식)";
+            document.getElementById('resPrice').innerText = "$" + price.toFixed(2);
+            document.getElementById('resTotalAsset').innerText = "$" + totalAssetUSD.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById('resMonthlyDiv').innerText = Math.round(monthlyDividendKRW).toLocaleString();
+            document.getElementById('resAnnualDiv').innerText = Math.round(annualDividendKRW).toLocaleString();
+            document.getElementById('displayYield').innerText = userYield + "%";
+
+            const resultBox = document.getElementById('resultBox');
+            resultBox.style.display = 'block';
+
+            const resultCard = resultBox.querySelector('.result-card');
+            resultCard.style.animation = 'none';
+            resultCard.offsetHeight;
+            resultCard.style.animation = 'fadeInUp 0.6s ease-out';
+
+            drawChart(monthlyDividendKRW);
+
+        } catch (error) {
+            console.error(error);
+            alert("에러가 발생했습니다.");
+        } finally {
+            btn.innerText = originalText;
         }
-    });
+    }
 
-    searchInput.addEventListener('input', function() {
-        tickerInput.value = this.value;
-    });
+    // 저장 버튼 기능 (임시)
+    function savePortfolio() {
+        alert("🚧 아직 데이터베이스 연결 전입니다!\n(다음 단계: 로그인 & DB 구현)");
+    }
 
-    /*[# th:if="${result != null}"]*/
-    document.addEventListener("DOMContentLoaded", function() {
+    function drawChart(monthlyAmount) {
         const ctx = document.getElementById('dividendChart');
-        if (!ctx) return;
+        if (myChart) myChart.destroy();
+        const chartData = Array(12).fill(Math.round(monthlyAmount));
 
-        const monthlyData = /*[[${result.monthlyData}]]*/ [0,0,0,0,0,0,0,0,0,0,0,0];
-
-        new Chart(ctx, {
+        myChart = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['1월', '2월', '3월', '4월', '5월', '6월',
-                    '7월', '8월', '9월', '10월', '11월', '12월'],
+                labels: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
                 datasets: [{
-                    label: '예상 배당금',
-                    data: monthlyData,
+                    label: '예상 배당금 (원)',
+                    data: chartData,
                     backgroundColor: '#3182F6',
-                    borderRadius: 8
+                    borderRadius: 6,
+                    barThickness: 12
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return context.parsed.y.toLocaleString() + '원';
-                            }
-                        }
-                    }
-                },
+                plugins: { legend: { display: false } },
                 scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: { display: false },
-                        ticks: {
-                            callback: function(value) {
-                                return value.toLocaleString() + '원';
-                            }
-                        }
-                    },
+                    y: { beginAtZero: true, grid: { display: false } },
                     x: { grid: { display: false } }
                 }
             }
         });
-    });
-    /*[/]*/
+    }
 </script>
 
 </body>
