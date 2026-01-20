@@ -1,7 +1,8 @@
 **/apikey.js
 
 # API 키 보호
-src/main/resources/templates/apikey.js
+src/main/resources/static/apikey.js
+
 
 # Gradle
 .gradle/
