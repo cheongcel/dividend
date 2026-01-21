@@ -28,13 +28,19 @@ public class DividendService {
     // 고정 환율 (나중에 실시간 API로 교체 가능)
     private static final BigDecimal USD_TO_KRW = new BigDecimal("1450");
 
-    // 기본 호환성 유지
+    // ⭐ 기본 호환성 유지 (userId 없이 호출 시)
     public Map<String, Object> calculateDividend(String ticker, int quantity) {
-        return calculateDividend(ticker, quantity, true);
+        return calculateDividend(ticker, quantity, true, null);
     }
 
-    @Transactional
+    // ⭐ saveMode만 있는 버전 (userId 없음)
     public Map<String, Object> calculateDividend(String ticker, int quantity, boolean saveMode) {
+        return calculateDividend(ticker, quantity, saveMode, null);
+    }
+
+    // ⭐ 메인 메서드: userId 추가!
+    @Transactional
+    public Map<String, Object> calculateDividend(String ticker, int quantity, boolean saveMode, Long userId) {
         // 한국 주식 티커 정리
         if (ticker.matches("[0-9]+") || (ticker.length() == 6 && !Character.isAlphabetic(ticker.charAt(0)))) {
             if (!ticker.endsWith(".KS")) ticker = ticker + ".KS";
@@ -47,7 +53,7 @@ public class DividendService {
             // API 실패하거나 주가 없으면 플랜 B
             if (stock == null || stock.getQuote() == null || stock.getQuote().getPrice() == null) {
                 System.out.println("⚠️ API 실패 -> 플랜 B: " + searchTicker);
-                return getFallbackData(searchTicker, quantity, saveMode);
+                return getFallbackData(searchTicker, quantity, saveMode, userId);
             }
 
             String companyName = stock.getName();
@@ -65,9 +71,9 @@ public class DividendService {
                     .multiply(dividendYield)
                     .divide(new BigDecimal(100), 2, RoundingMode.HALF_UP);
 
-            // 저장 모드일 때만 DB 저장
-            if (saveMode) {
-                saveToDb(searchTicker, companyName, priceKRW, annualDividendPerShare, quantity);
+            // ⭐ 저장 모드일 때만 DB 저장 (userId 전달)
+            if (saveMode && userId != null) {
+                saveToDb(searchTicker, companyName, priceKRW, annualDividendPerShare, quantity, userId);
             }
 
             return buildResult(companyName, priceKRW, annualDividendPerShare, quantity, searchTicker);
@@ -75,15 +81,15 @@ public class DividendService {
         } catch (Exception e) {
             System.out.println("⚠️ 에러 발생 -> 플랜 B 가동: " + e.getMessage());
             e.printStackTrace();
-            return getFallbackData(searchTicker, quantity, saveMode);
+            return getFallbackData(searchTicker, quantity, saveMode, userId);
         }
     }
 
-    private Map<String, Object> getFallbackData(String ticker, int quantity, boolean saveMode) {
+    // ⭐ 플랜 B: userId 추가
+    private Map<String, Object> getFallbackData(String ticker, int quantity, boolean saveMode, Long userId) {
         String name = ticker + " (Simulated)";
         BigDecimal price = new BigDecimal("50000");
         BigDecimal dividendPerShare = new BigDecimal("1000");
-
 
         // 미국 주식이면 환율 적용
         if (!ticker.endsWith(".KS")) {
@@ -102,8 +108,9 @@ public class DividendService {
             dividendPerShare = new BigDecimal("1444");
         }
 
-        if (saveMode) {
-            saveToDb(ticker, name, price, dividendPerShare, quantity);
+        // ⭐ userId 전달
+        if (saveMode && userId != null) {
+            saveToDb(ticker, name, price, dividendPerShare, quantity, userId);
         }
 
         return buildResult(name, price, dividendPerShare, quantity, ticker);
@@ -142,7 +149,8 @@ public class DividendService {
         return result;
     }
 
-    private void saveToDb(String ticker, String name, BigDecimal price, BigDecimal annualDiv, int quantity) {
+    // ⭐ DB 저장: userId 파라미터 추가!
+    private void saveToDb(String ticker, String name, BigDecimal price, BigDecimal annualDiv, int quantity, Long userId) {
         try {
             // 배당월 문자열 생성
             List<Integer> months = guessDividendMonths(ticker);
@@ -150,7 +158,7 @@ public class DividendService {
                     .map(String::valueOf)
                     .collect(Collectors.joining(","));
 
-            // DividendEntity 저장/업데이트
+            // DividendEntity 저장/업데이트 (종목 정보)
             DividendEntity entity = dividendRepository.findByTicker(ticker);
 
             if (entity == null) {
@@ -169,16 +177,23 @@ public class DividendService {
             }
             dividendRepository.save(entity);
 
-            // UserPortfolio 저장/업데이트
-            UserPortfolio myStock = userPortfolioRepository.findByTicker(ticker);
+            // ⭐ UserPortfolio 저장/업데이트 (사용자별 포트폴리오)
+            // 기존 코드:
+            // UserPortfolio myStock = userPortfolioRepository.findByTicker(ticker);
+
+            // ⭐ 수정 후: userId로 찾기
+            UserPortfolio myStock = userPortfolioRepository.findByUserIdAndTicker(userId, ticker);
+
             if (myStock != null) {
+                // 이미 있으면 수량 추가
                 myStock.addQuantity(quantity);
             } else {
-                myStock = new UserPortfolio(ticker, quantity);
+                // 없으면 새로 생성 (userId 포함!)
+                myStock = new UserPortfolio(userId, ticker, quantity);
             }
             userPortfolioRepository.save(myStock);
 
-            System.out.println("✅ DB 저장 완료: " + ticker);
+            System.out.println("✅ DB 저장 완료: " + ticker + " (User: " + userId + ")");
 
         } catch (Exception e) {
             System.out.println("⚠️ DB 저장 실패: " + e.getMessage());

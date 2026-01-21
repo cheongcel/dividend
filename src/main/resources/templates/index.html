@@ -320,6 +320,30 @@
         <a href="/calculator" class="toss-btn">내 배당금 확인하기 →</a>
     </div>
 </div>
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="/" class="nav-brand" style="display: flex; align-items: center; text-decoration: none;">
+            <img src="/images/favicon.png" alt="DIVY" style="height: 33px;">
+            <span style="font-size: 25px; font-weight: 300; color: #3182F6;">DIVY</span>
+        </a>
+        <div class="nav-menu">
+            <!-- ⭐ 추가: 로그인 상태 표시 -->
+            <span th:if="${session.userId != null}"
+                  style="color: #666; font-weight: 600; margin-right: 15px; font-size: 14px;">
+                <span th:text="${session.userName}">사용자</span>님
+            </span>
+
+            <a href="/calculator">계산기</a>
+            <a href="/goal">로드맵</a>
+            <a href="/calendar">캘린더</a>
+
+            <!-- ⭐ 추가: 로그인/로그아웃 버튼 -->
+            <a th:if="${session.userId == null}" href="/login">로그인</a>
+            <a th:if="${session.userId != null}" href="/logout"
+               style="color: #FF6B6B;">로그아웃</a>
+        </div>
+    </div>
+</nav>
 
 </body>
 </html>
