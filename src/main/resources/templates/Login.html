@@ -1,10 +1,84 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <link rel="icon" href="/images/favicon.png">
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>DIVY - 로그인</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" as="style" crossorigin
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
+
+    <style>
+        body { margin: 0; padding: 0; font-family: "Pretendard", sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+
+        .login-container { background: white; padding: 40px; border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3); width: 400px; max-width: 90%; }
+
+        .logo { text-align: center; margin-bottom: 30px; }
+        .logo-text { font-size: 36px; font-weight: 800; color: #3182F6; }
+
+        h2 { text-align: center; margin-bottom: 30px; color: #333; font-size: 24px; }
+
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-weight: 600; color: #4E5968; margin-bottom: 8px; font-size: 14px; }
+
+        input { width: 100%; padding: 15px; border: 1px solid #E5E8EB; border-radius: 12px;
+            font-size: 16px; outline: none; transition: 0.2s; box-sizing: border-box; }
+        input:focus { border-color: #3182F6; box-shadow: 0 0 0 2px rgba(49, 130, 246, 0.1); }
+
+        .success-message { background: #E8F5E9; color: #2E7D32; padding: 12px; border-radius: 8px;
+            margin-bottom: 20px; font-size: 14px; display: none; }
+        .success-message.show { display: block; }
+
+        .error-message { background: #FFF3F3; color: #D32F2F; padding: 12px; border-radius: 8px;
+            margin-bottom: 20px; font-size: 14px; display: none; }
+        .error-message.show { display: block; }
+
+        button { width: 100%; padding: 18px; background-color: #3182F6; color: white;
+            border: none; border-radius: 12px; font-size: 16px; font-weight: 700;
+            cursor: pointer; transition: 0.2s; }
+        button:hover { background-color: #2563EB; transform: translateY(-2px); }
+
+        .link-box { text-align: center; margin-top: 20px; color: #6B7684; font-size: 14px; }
+        .link-box a { color: #3182F6; text-decoration: none; font-weight: 600; }
+        .link-box a:hover { text-decoration: underline; }
+    </style>
 </head>
 <body>
+
+<div class="login-container">
+    <div class="logo">
+        <div class="logo-text">DIVY</div>
+        <p style="color: #8B95A1; font-size: 14px; margin-top: 5px;">배당금 계산 & 관리 서비스</p>
+    </div>
+
+    <h2>로그인</h2>
+
+    <div class="success-message" th:if="${message}" th:text="${message}" th:classappend="show"></div>
+    <div class="error-message" th:if="${error}" th:text="${error}" th:classappend="show"></div>
+
+    <form action="/login" method="post">
+        <div class="form-group">
+            <label for="email">이메일</label>
+            <input type="email" id="email" name="email"
+                   placeholder="example@email.com" required>
+        </div>
+
+        <div class="form-group">
+            <label for="password">비밀번호</label>
+            <input type="password" id="password" name="password"
+                   placeholder="비밀번호 입력" required>
+        </div>
+
+        <button type="submit">로그인</button>
+    </form>
+
+    <div class="link-box">
+        계정이 없으신가요? <a href="/signup">회원가입</a>
+    </div>
+</div>
 
 </body>
 </html>
