@@ -19,6 +19,7 @@
             align-items: center; padding: 0 20px; }
         .nav-brand { font-weight: 800; font-size: 20px;
             color: #3182F6; text-decoration: none; }
+        .nav-menu { display: flex; align-items: center; }
         .nav-menu a { text-decoration: none; color: #666;
             font-weight: 600; margin-left: 15px;
             font-size: 14px; transition: color 0.2s; }
@@ -65,6 +66,30 @@
             display: inline-block; margin-bottom: 10px;
         }
 
+        /* ⭐ 로그인 유도 배너 스타일 */
+        .login-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; padding: 25px; border-radius: 20px;
+            margin-top: 20px; text-align: center;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        .login-banner h3 {
+            margin: 0 0 10px 0; font-size: 20px; font-weight: 800;
+        }
+        .login-banner p {
+            margin: 0 0 20px 0; font-size: 14px; opacity: 0.9;
+        }
+        .login-btn {
+            background-color: white; color: #667eea;
+            padding: 12px 30px; border-radius: 12px;
+            text-decoration: none; font-weight: 700;
+            display: inline-block; transition: 0.2s;
+        }
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .animate-up { animation: slideUp 0.5s ease-out; }
     </style>
@@ -78,9 +103,8 @@
             <span style="font-size: 25px; font-weight: 300; color: #3182F6;">DIVY</span>
         </a>
         <div class="nav-menu">
-            <!-- ⭐ 추가: 로그인 상태 표시 -->
             <span th:if="${session.userId != null}"
-                  style="color: #666; font-weight: 600; margin-right: 15px; font-size: 14px;">
+                  style="color: #333; font-weight: 600; margin-left: 25px; font-size: 14px;">
                 <span th:text="${session.userName}">사용자</span>님
             </span>
 
@@ -88,14 +112,12 @@
             <a href="/goal" style="color:#3182F6">로드맵</a>
             <a href="/calendar">캘린더</a>
 
-            <!-- ⭐ 추가: 로그인/로그아웃 버튼 -->
             <a th:if="${session.userId == null}" href="/login">로그인</a>
             <a th:if="${session.userId != null}" href="/logout"
                style="color: #FF6B6B;">로그아웃</a>
         </div>
     </div>
 </nav>
-
 
 <div class="container">
     <div class="card animate-up">
@@ -114,7 +136,16 @@
         </form>
     </div>
 
-    <div class="card animate-up" th:if="${targetMonthly > 0}">
+    <!-- ⭐ 비로그인 + 목표 설정했을 때: 로그인 유도 배너 -->
+    <div class="login-banner animate-up"
+         th:if="${session.userId == null and targetMonthly > 0}">
+        <h3>🔐 로그인하고 내 현황을 확인하세요!</h3>
+        <p>포트폴리오를 추가하면 실시간으로<br>목표 달성률을 확인할 수 있어요</p>
+        <a href="/login" class="login-btn">로그인하기</a>
+    </div>
+
+    <!-- ⭐ 로그인 했을 때만 진행상황 표시 -->
+    <div class="card animate-up" th:if="${session.userId != null and targetMonthly > 0}">
         <div style="font-size: 14px; color: #6B7684;">현재 달성률</div>
         <div class="percent-badge" th:text="${progressPercent} + '%'">0%</div>
 
@@ -157,7 +188,6 @@
         <div style="margin-top: 15px; font-size: 12px; color: #8B95A1; text-align: center; line-height: 1.5;">
             ※ 위 금액은 현재 배당금 기준이며, 기업 실적에 따라 변동될 수 있습니다.
         </div>
-
     </div>
 </div>
 

@@ -223,9 +223,33 @@
                 </div>
             </div>
 
+            <!-- ⭐ form 추가 -->
+            <form action="/add" method="post" id="saveForm" style="display: none;">
+                <input type="hidden" name="ticker" id="saveTicker">
+                <input type="hidden" name="quantity" id="saveQuantity">
+            </form>
+
             <button type="button" onclick="savePortfolio()">
                 📂 내 포트폴리오에 저장하기
             </button>
+
+            <script>
+                function savePortfolio() {
+                    // 현재 계산된 종목 정보 가져오기
+                    const ticker = document.getElementById('inputTicker').value.trim();
+                    const quantity = document.getElementById('inputQuantity').value;
+
+                    if (!ticker || !quantity) {
+                        alert('종목과 수량을 입력해주세요.');
+                        return;
+                    }
+
+                    // ⭐ form에 값 설정 후 제출
+                    document.getElementById('saveTicker').value = ticker;
+                    document.getElementById('saveQuantity').value = quantity;
+                    document.getElementById('saveForm').submit();
+                }
+            </script>
         </div>
     </div>
 </div>
@@ -551,11 +575,6 @@
         } finally {
             showLoading(false);
         }
-    }
-
-    // ========== 포트폴리오 저장 ==========
-    function savePortfolio() {
-        alert("🚧 아직 데이터베이스 연결 전입니다!\n\n다음 단계:\n✅ Spring Boot 백엔드 구축\n✅ 로그인 시스템\n✅ MySQL 연동");
     }
 
     // ========== 차트 그리기 ==========

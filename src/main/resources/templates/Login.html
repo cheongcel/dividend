@@ -10,14 +10,14 @@
 
     <style>
         body { margin: 0; padding: 0; font-family: "Pretendard", sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #3182F6 0%, #00C851 100%);
             min-height: 100vh; display: flex; align-items: center; justify-content: center; }
 
         .login-container { background: white; padding: 40px; border-radius: 24px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3); width: 400px; max-width: 90%; }
 
         .logo { text-align: center; margin-bottom: 30px; }
-        .logo-text { font-size: 36px; font-weight: 800; color: #3182F6; }
+        .logo-text { font-size: 36px; font-weight: 300; color: #3182F6; }
 
         h2 { text-align: center; margin-bottom: 30px; color: #333; font-size: 24px; }
 
@@ -50,7 +50,10 @@
 
 <div class="login-container">
     <div class="logo">
-        <div class="logo-text">DIVY</div>
+        <div style="display: flex; align-items: center; justify-content: center; gap: 4px;">
+            <img src="/images/favicon.png" alt="DIVY" style="width: 40px; height: 40px;">
+            <div class="logo-text">DIVY</div>
+        </div>
         <p style="color: #8B95A1; font-size: 14px; margin-top: 5px;">배당금 계산 & 관리 서비스</p>
     </div>
 
