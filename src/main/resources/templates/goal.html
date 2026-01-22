@@ -66,28 +66,41 @@
             display: inline-block; margin-bottom: 10px;
         }
 
-        /* ⭐ 로그인 유도 배너 스타일 */
-        .login-banner {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white; padding: 25px; border-radius: 20px;
-            margin-top: 20px; text-align: center;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        /* ⭐ 블러 처리 스타일 */
+        .blur-overlay {
+            position: relative;
         }
-        .login-banner h3 {
-            margin: 0 0 10px 0; font-size: 20px; font-weight: 800;
+        .blur-overlay::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(8px);
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 24px;
+            z-index: 1;
         }
-        .login-banner p {
-            margin: 0 0 20px 0; font-size: 14px; opacity: 0.9;
+        .blur-message {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+            text-align: center;
+            width: 80%;
         }
-        .login-btn {
-            background-color: white; color: #667eea;
-            padding: 12px 30px; border-radius: 12px;
-            text-decoration: none; font-weight: 700;
-            display: inline-block; transition: 0.2s;
+        .login-cta-btn {
+            background: linear-gradient(135deg, #3182F6, #6B9EFF);
+            color: white; border: none;
+            padding: 14px 28px; border-radius: 12px;
+            font-weight: 700; font-size: 15px;
+            cursor: pointer; transition: 0.2s;
+            box-shadow: 0 4px 15px rgba(49, 130, 246, 0.3);
+            text-decoration: none;
+            display: inline-block;
         }
-        .login-btn:hover {
+        .login-cta-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            box-shadow: 0 6px 20px rgba(49, 130, 246, 0.4);
         }
 
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -103,14 +116,15 @@
             <span style="font-size: 25px; font-weight: 300; color: #3182F6;">DIVY</span>
         </a>
         <div class="nav-menu">
+            <a href="/calculator">계산기</a>
+            <a href="/goal" style="color:#3182F6">로드맵</a>
+            <a href="/calendar">캘린더</a>
+
+            <!-- ⭐ 사용자명 오른쪽으로 -->
             <span th:if="${session.userId != null}"
                   style="color: #333; font-weight: 600; margin-left: 25px; font-size: 14px;">
                 <span th:text="${session.userName}">사용자</span>님
             </span>
-
-            <a href="/calculator">계산기</a>
-            <a href="/goal" style="color:#3182F6">로드맵</a>
-            <a href="/calendar">캘린더</a>
 
             <a th:if="${session.userId == null}" href="/login">로그인</a>
             <a th:if="${session.userId != null}" href="/logout"
@@ -136,16 +150,25 @@
         </form>
     </div>
 
-    <!-- ⭐ 비로그인 + 목표 설정했을 때: 로그인 유도 배너 -->
-    <div class="login-banner animate-up"
-         th:if="${session.userId == null and targetMonthly > 0}">
-        <h3>🔐 로그인하고 내 현황을 확인하세요!</h3>
-        <p>포트폴리오를 추가하면 실시간으로<br>목표 달성률을 확인할 수 있어요</p>
-        <a href="/login" class="login-btn">로그인하기</a>
-    </div>
+    <!-- ⭐ 달성률 카드: 비로그인 시 블러 처리 -->
+    <div class="card animate-up" th:if="${targetMonthly > 0}"
+         th:classappend="${session.userId == null} ? 'blur-overlay' : ''">
 
-    <!-- ⭐ 로그인 했을 때만 진행상황 표시 -->
-    <div class="card animate-up" th:if="${session.userId != null and targetMonthly > 0}">
+        <!-- ⭐ 비로그인 시 표시되는 메시지 -->
+        <div th:if="${session.userId == null}" class="blur-message">
+            <div style="font-size: 24px; margin-bottom: 15px;">🔒</div>
+            <div style="font-size: 16px; font-weight: 700; color: #333; margin-bottom: 12px;">
+                내 포트폴리오 달성률 확인하기
+            </div>
+            <div style="font-size: 13px; color: #6B7684; margin-bottom: 20px;">
+                로그인하고 실시간 배당금 현황을 확인하세요
+            </div>
+            <a href="/login" class="login-cta-btn">
+                로그인하고 확인하기
+            </a>
+        </div>
+
+        <!-- ⭐ 실제 콘텐츠 (로그인 시 정상 표시, 비로그인 시 블러 처리됨) -->
         <div style="font-size: 14px; color: #6B7684;">현재 달성률</div>
         <div class="percent-badge" th:text="${progressPercent} + '%'">0%</div>
 
@@ -188,6 +211,7 @@
         <div style="margin-top: 15px; font-size: 12px; color: #8B95A1; text-align: center; line-height: 1.5;">
             ※ 위 금액은 현재 배당금 기준이며, 기업 실적에 따라 변동될 수 있습니다.
         </div>
+
     </div>
 </div>
 
