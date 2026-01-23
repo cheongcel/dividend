@@ -52,7 +52,7 @@ public class AuthController {
         userRepository.save(user);
 
         // 회원가입 성공 → 로그인 페이지로
-        return "redirect:/login?signup=success";
+        return "redirect:/dashboard"; // ⭐ 인덱스 대신 대시보드로
     }
 
     // ========== 로그인 페이지 ==========
