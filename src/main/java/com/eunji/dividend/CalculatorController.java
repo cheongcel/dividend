@@ -58,7 +58,12 @@ public class CalculatorController {
         // ⭐ 로그인 체크
         Long userId = (Long) session.getAttribute("userId");
         if (userId == null) {
-            return "redirect:/login"; // 로그인 안 했으면 로그인 페이지로
+            // ⭐ 저장할 데이터를 세션에 임시 저장
+            session.setAttribute("pendingTicker", ticker);
+            session.setAttribute("pendingQuantity", quantity);
+
+            // ⭐ 로그인 후 돌아올 URL 지정
+            return "redirect:/login?redirectUrl=/add-pending";
         }
 
         // ⭐ 반환값 받기 (에러 체크)
@@ -67,6 +72,38 @@ public class CalculatorController {
         if (result.containsKey("error")) {
             model.addAttribute("error", result.get("error"));
             return "calculator"; // 에러 시 다시 계산기로
+        }
+
+        return "redirect:/calendar";
+    }
+
+    // ⭐ 새로 추가: 로그인 후 저장 처리
+    @GetMapping("/add-pending")
+    public String addPendingStock(HttpSession session, Model model) {
+        // 로그인 체크
+        Long userId = (Long) session.getAttribute("userId");
+        if (userId == null) {
+            return "redirect:/login";
+        }
+
+        // 임시 저장된 데이터 가져오기
+        String ticker = (String) session.getAttribute("pendingTicker");
+        Integer quantity = (Integer) session.getAttribute("pendingQuantity");
+
+        if (ticker == null || quantity == null) {
+            return "redirect:/calculator"; // 데이터 없으면 계산기로
+        }
+
+        // 세션에서 삭제
+        session.removeAttribute("pendingTicker");
+        session.removeAttribute("pendingQuantity");
+
+        // 저장 처리
+        Map<String, Object> result = dividendService.calculateDividend(ticker, quantity, true, userId);
+
+        if (result.containsKey("error")) {
+            model.addAttribute("error", result.get("error"));
+            return "calculator";
         }
 
         return "redirect:/calendar";

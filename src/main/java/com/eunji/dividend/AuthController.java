@@ -57,10 +57,19 @@ public class AuthController {
 
     // ========== 로그인 페이지 ==========
     @GetMapping("/login")
-    public String showLogin(@RequestParam(required = false) String signup, Model model) {
+    public String showLogin(
+            @RequestParam(required = false) String signup,
+            @RequestParam(required = false) String redirectUrl,  // ⭐ 추가
+            HttpSession session,
+            Model model) {
+
         if ("success".equals(signup)) {
             model.addAttribute("message", "회원가입 성공! 로그인해주세요.");
         }
+        if (redirectUrl != null && !redirectUrl.isEmpty()) {
+            session.setAttribute("redirectAfterLogin", redirectUrl);
+        }
+
         return "login";
     }
 
@@ -92,6 +101,13 @@ public class AuthController {
         session.setAttribute("userId", user.getId());
         session.setAttribute("userName", user.getName());
         session.setAttribute("userEmail", user.getEmail());
+
+        String redirectUrl = (String) session.getAttribute("redirectAfterLogin");
+
+        if (redirectUrl != null && !redirectUrl.isEmpty()) {
+            session.removeAttribute("redirectAfterLogin"); // 사용 후 삭제
+            return "redirect:" + redirectUrl;
+        }
 
         // 메인 페이지로
         return "redirect:/";
