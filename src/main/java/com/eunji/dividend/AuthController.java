@@ -117,6 +117,6 @@ public class AuthController {
     @GetMapping("/logout")
     public String logout(HttpSession session) {
         session.invalidate(); // 세션 삭제
-        return "redirect:/login?logout=success";
+        return "redirect:/"; // ⭐ 인덱스로 변경
     }
 }
