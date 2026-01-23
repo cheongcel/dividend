@@ -105,12 +105,12 @@ public class AuthController {
         String redirectUrl = (String) session.getAttribute("redirectAfterLogin");
 
         if (redirectUrl != null && !redirectUrl.isEmpty()) {
-            session.removeAttribute("redirectAfterLogin"); // 사용 후 삭제
+            session.removeAttribute("redirectAfterLogin");
             return "redirect:" + redirectUrl;
         }
 
         // 메인 페이지로
-        return "redirect:/";
+        return "redirect:/dashboard";
     }
 
     // ========== 로그아웃 ==========

@@ -348,6 +348,7 @@
             <span style="color: #333; font-weight: 600; margin-left: 25px; font-size: 14px;">
                 <span th:text="${session.userName}">사용자</span>님
             </span>
+            <a href="/dashboard" style="color:#3182F6">홈</a>
             <a href="/calculator">계산기</a>
             <a href="/goal">로드맵</a>
             <a href="/calendar">캘린더</a>
@@ -364,7 +365,6 @@
         </div>
         <div class="welcome-sub">오늘도 당신의 자산이 일하고 있습니다</div>
     </div>
-
     <!-- 빈 상태 -->
     <div th:if="${stockCount == 0}" class="card">
         <div class="empty-state">
@@ -433,6 +433,37 @@
                 </div>
                 <div class="chart-container">
                     <canvas id="monthlyChart"></canvas>
+                </div>
+            </div>
+            <!-- 목표 달성률 프로그레스 바 -->
+            <div class="card" style="margin-top: 20px; animation: fadeInUp 0.7s ease-out backwards;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <div>
+                        <div style="font-size: 14px; color: #8B95A1; margin-bottom: 4px;">🎯 경제적 자유 목표</div>
+                        <div style="font-size: 24px; font-weight: 800; color: #3182F6;">
+                            0% 달성
+                        </div>
+                    </div>
+                    <a href="/goal" style="padding: 10px 20px; background: #F8FAFB; color: #3182F6; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 14px; transition: 0.2s;">
+                        목표 설정하기
+                    </a>
+                </div>
+
+                <!-- 프로그레스 바 -->
+                <div style="background: #E5E8EB; border-radius: 20px; height: 28px; overflow: hidden; position: relative; margin-bottom: 12px;">
+                    <div id="goalProgressBar" style="
+                    background: linear-gradient(90deg, #3182F6, #6B9EFF);
+                    height: 100%;
+                    border-radius: 20px;
+                    width: 0%;
+                    transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+                "></div>
+                </div>
+
+                <!-- 현재/목표 금액 -->
+                <div style="display: flex; justify-content: space-between; font-size: 13px; color: #8B95A1;">
+                    <span>현재: <b style="color: #191F28;"><span th:text="${#numbers.formatInteger(monthlyAvg, 0, 'COMMA')}">0</span>원</b></span>
+                    <span>목표: <b style="color: #191F28;">미설정</b></span>
                 </div>
             </div>
 
