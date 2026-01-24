@@ -153,10 +153,6 @@
         }
 
         /* 차트 카드 */
-        .chart-card {
-            grid-column: span 2;
-        }
-
         .card-header {
             display: flex;
             justify-content: space-between;
@@ -308,7 +304,6 @@
         @media (max-width: 1024px) {
             .grid-3 { grid-template-columns: 1fr; }
             .grid-2 { grid-template-columns: 1fr; }
-            .chart-card { grid-column: span 1; }
         }
 
         /* 빈 상태 */
@@ -365,6 +360,7 @@
         </div>
         <div class="welcome-sub">오늘도 당신의 자산이 일하고 있습니다</div>
     </div>
+
     <!-- 빈 상태 -->
     <div th:if="${stockCount == 0}" class="card">
         <div class="empty-state">
@@ -424,10 +420,10 @@
             </div>
         </div>
 
-        <!-- 차트 + 포트폴리오 -->
+        <!-- ⭐ 차트 + 포트폴리오 (2:1 비율로 나란히) -->
         <div class="grid-2">
-            <!-- 월별 차트 -->
-            <div class="card chart-card">
+            <!-- 월별 차트 (2칸) -->
+            <div class="card">
                 <div class="card-header">
                     <div class="card-title">📅 월별 배당금 추이</div>
                 </div>
@@ -435,39 +431,8 @@
                     <canvas id="monthlyChart"></canvas>
                 </div>
             </div>
-            <!-- 목표 달성률 프로그레스 바 -->
-            <div class="card" style="margin-top: 20px; animation: fadeInUp 0.7s ease-out backwards;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                    <div>
-                        <div style="font-size: 14px; color: #8B95A1; margin-bottom: 4px;">🎯 경제적 자유 목표</div>
-                        <div style="font-size: 24px; font-weight: 800; color: #3182F6;">
-                            0% 달성
-                        </div>
-                    </div>
-                    <a href="/goal" style="padding: 10px 20px; background: #F8FAFB; color: #3182F6; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 14px; transition: 0.2s;">
-                        목표 설정하기
-                    </a>
-                </div>
 
-                <!-- 프로그레스 바 -->
-                <div style="background: #E5E8EB; border-radius: 20px; height: 28px; overflow: hidden; position: relative; margin-bottom: 12px;">
-                    <div id="goalProgressBar" style="
-                    background: linear-gradient(90deg, #3182F6, #6B9EFF);
-                    height: 100%;
-                    border-radius: 20px;
-                    width: 0%;
-                    transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
-                "></div>
-                </div>
-
-                <!-- 현재/목표 금액 -->
-                <div style="display: flex; justify-content: space-between; font-size: 13px; color: #8B95A1;">
-                    <span>현재: <b style="color: #191F28;"><span th:text="${#numbers.formatInteger(monthlyAvg, 0, 'COMMA')}">0</span>원</b></span>
-                    <span>목표: <b style="color: #191F28;">미설정</b></span>
-                </div>
-            </div>
-
-            <!-- 포트폴리오 리스트 -->
+            <!-- 포트폴리오 리스트 (1칸) -->
             <div class="card">
                 <div class="card-header">
                     <div class="card-title">💼 내 포트폴리오</div>
@@ -494,6 +459,37 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- ⭐ 목표 달성률 프로그레스 바 (독립 카드, 전체 너비) -->
+        <div class="card" style="animation: fadeInUp 0.7s ease-out backwards; animation-delay: 0.6s;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <div>
+                    <div style="font-size: 24px; font-weight: 800; color: #3182F6;">
+                        0% 달성
+                    </div>
+                </div>
+                <a href="/goal" style="padding: 10px 20px; background: #F8FAFB; color: #3182F6; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 14px; transition: 0.2s;">
+                    목표 설정하기
+                </a>
+            </div>
+
+            <!-- 프로그레스 바 -->
+            <div style="background: #E5E8EB; border-radius: 20px; height: 28px; overflow: hidden; position: relative; margin-bottom: 12px;">
+                <div id="goalProgressBar" style="
+                    background: linear-gradient(90deg, #3182F6, #6B9EFF);
+                    height: 100%;
+                    border-radius: 20px;
+                    width: 0%;
+                    transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+                "></div>
+            </div>
+
+            <!-- 현재/목표 금액 -->
+            <div style="display: flex; justify-content: space-between; font-size: 13px; color: #8B95A1;">
+                <span>현재: <b style="color: #191F28;"><span th:text="${#numbers.formatInteger(monthlyAvg, 0, 'COMMA')}">0</span>원</b></span>
+                <span>목표: <b style="color: #191F28;">미설정</b></span>
             </div>
         </div>
 
