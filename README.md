@@ -1,209 +1,70 @@
- DIVY - 배당금 계산기
+💰 DIVY - Dividend Calculator
+"Visualize your dividend cash flow in just 3 seconds." An intuitive asset management service designed to eliminate the complexity of dividend tracking and portfolio planning.
 
->  직관적한 배당금 관리 서비스
+🎯 Strategic Overview
+Many dividend investors struggle with fragmented data across different exchanges and the tedious task of manual calculation in spreadsheets. DIVY solves this by providing a seamless, "zero-barrier" experience.
 
+The Problem: Complex manual calculations for monthly/quarterly dividend cycles and tedious currency conversions.
 
- 🎯 프로젝트 소개
+The Solution: An automated dashboard that fetches, calculates, and visualizes dividend data with a single ticker input.
 
-DIVY는 배당 투자자를 위한 올인원 배당금 관리 플랫폼입니다.  
-복잡한 계산 없이 3초 만에 내 배당금을 확인하고, 목표를 설정할 수 있습니다.
+📸 Screenshots
+(-)
 
- 📸 주요 화면
+✨ Key Features
+Personalized Dashboard: Real-time visualization of annual/monthly dividend trends using Chart.js.
 
-[대시보드](screenshots/dashboard.png)
-실시간 배당금 현황을 한눈에
+Smart Calculator: Instant calculation for both KOSPI/KOSDAQ and US stocks with automatic currency conversion.
 
-[계산기](screenshots/calculator.png)
-간단한 입력으로 즉시 계산
+Dynamic Calendar: Monthly dividend distribution view with a toggle between Calendar and List formats.
 
-[캘린더](screenshots/calendar.png)
-월별 배당금을 달력으로 확인
+Investment Goal Tracker: Reverse-calculates the required capital to reach specific monthly passive income goals.
 
+🏗️ Tech Stack
+Backend
+Java 17 / Spring Boot 3.2
 
-✨ 주요 기능
+Spring Data JPA
 
- 💼 개인화된 대시보드
-- 연간/월간 예상 배당금 한눈에 확인
-- Chart.js 기반 월별 배당금 추이 시각화
-- 보유 종목별 배당률 분석
+Spring Security (Session-based Authentication)
 
- 🧮 실시간 배당금 계산기
-- 종목 코드 입력만으로 즉시 계산
-- 한국/미국 주식 지원
-- 환율 자동 적용
+H2 (Dev) / PostgreSQL (Prod)
 
- 📅 월별 배당 캘린더
-- 12개월 배당금 분포 확인
-- 달력형/리스트형 뷰 전환
-- 종목별 상세 내역
+Frontend
+Thymeleaf (Server-side Rendering)
 
- 🎯 경제적 자유 로드맵
-- 목표 금액 설정
-- 현재 달성률 시각화
-- 필요한 투자금액 계산
+Vanilla JavaScript & Chart.js
 
+CSS3 (Responsive Design & UI/UX)
 
- 🏗️ 기술 스택
+🎨 Engineering Challenges & Solutions
+1. Financial Data Integrity
+Challenge: Precision issues when distributing annual dividends into monthly slots and handling exchange rates. Solution: Implemented BigDecimal for all monetary calculations to prevent floating-point errors. Used RoundingMode.HALF_UP to ensure cent-perfect accuracy during monthly distribution logic.
 
- Backend
-- Java 17
-- Spring Boot 3.2
-- Spring Data JPA
-- Session 기반 인증
+2. Optimizing User Conversion (UX)
+Challenge: High bounce rates often occur when forced to sign up before experiencing the product's value. Solution: Designed a "Calculator-First" flow. Users can use the core calculator immediately; a CSS blur effect and seamless login redirection are used only when the user attempts to "Save" the data, successfully increasing the potential sign-up conversion.
 
- Frontend
-- Thymeleaf
-- Chart.js (데이터 시각화)
-- Vanilla JavaScript
-- CSS3
+3. RESTful API Design & Data Isolation
+Challenge: Ensuring secure and intuitive data access for personalized portfolios. Solution: Structured the API following REST principles and utilized Spring Security sessions to ensure strict data isolation between users.
 
- Database
-- PostgreSQL (Production)
-- H2 (Development)
+HTTP
 
- Deploy
-- Render.com
+GET    /api/v1/dashboard    - Fetch calculated portfolio statistics
+POST   /api/v1/portfolios   - Add a new ticker to user's collection
+DELETE /api/v1/portfolios   - Remove a stock from the portfolio
+PATCH  /api/v1/goals        - Update investment target goals
+🚀 Getting Started
+(Keep your existing Getting Started section here)
 
+📈 Future Roadmap
+[ ] Real-time Integration: Moving from static data to Alpha Vantage/Yahoo Finance API.
 
- 🎨 기술적 특징
+[ ] Test Excellence: Increasing Unit Test coverage to 80% with JUnit5 & Mockito.
 
- 1. UX/UI
-- 직관적인 사용자 플로우
-- 부드러운 애니메이션 (CSS transition)
+[ ] Push Notifications: Automated alerts for upcoming "Ex-Dividend" dates.
 
- 2. Chart.js 커스터마이징
-- 월별 배당금 라인 차트
-- 반응형 차트 (모바일 대응)
-- 호버 시 상세 정보 표시
-
- 3. 사용자별 데이터 분리
-- 세션 기반 인증
-- 개인화된 포트폴리오 관리
-- 보안을 고려한 데이터 접근 제어
-
- 4. RESTful API 설계
-GET  /dashboard    - 대시보드
-POST /calculate    - 배당금 계산
-POST /add         - 포트폴리오 추가
-POST /delete      - 종목 삭제
-GET  /calendar    - 월별 캘린더
-GET  /goal        - 목표 설정
-
-
-
- 📊 데이터베이스 구조
-```sql
-users
-- id (PK)
-- email (UNIQUE)
-- password (BCrypt 암호화)
-- name
-- created_at
-
-user_portfolio
-- id (PK)
-- user_id (FK)
-- ticker
-- quantity
-
-dividend_data
-- ticker (PK)
-- company_name
-- dividend
-- dividend_months
-- price
-
- 🚀 실행 방법
-
-### 1. Clone
-```bash
-git clone https://github.com/yourusername/DIVY.git
-cd DIVY
-```
-
-### 2. 환경변수 설정
-```properties
-# application.properties
-spring.datasource.url=jdbc:postgresql://localhost:5432/divy
-spring.datasource.username=your_username
-spring.datasource.password=your_password
-```
-
-### 3. 실행
-```bash
-./mvnw spring-boot:run
-```
-
-### 4. 접속
-```
-http://localhost:8080
-```
-
-<br>
-
- 🌐 배포
-
-🔗 Live Demo:** https://divy.up.railway.app
-
-- Railway를 통한 자동 배포
-- PostgreSQL 데이터베이스 연동
-- 환경변수 기반 설정 관리
-
-
-
- 💡 개발 과정에서 고민한 점
-
- 1. UX 설계
- 문제: 배당금 계산이 복잡하고 진입장벽이 높음
-
-해결:
-- 토스 UX 벤치마킹 (3초 안에 핵심 기능 접근)
-- 비로그인 시 블러 처리로 후킹
-- 계산기 → 저장 → 로그인 → 캘린더 자연스러운 플로우
-
- 2. 월별 배당금 분배 로직
- 문제: 주식마다 배당 월이 다름 (분기별, 월별, 연간)
-
-해결:
-java
-// 배당 월 수로 나눠서 분배
-BigDecimal splitAmount = totalDividend.divide(
-    new BigDecimal(dividendMonths.length), 
-    RoundingMode.HALF_UP
-);
-```
-
- 3. 차트 반응형 처리
- 문제: Chart.js 기본 설정은 반응형이 완벽하지 않음
-
-해결:
-```javascript
-options: {
-    responsive: true,
-    maintainAspectRatio: false
-}
-```
-
- 📈 향후 개선 계획
-
-- [ ] 실시간 주가 API 연동
-- [ ] 배당 히스토리 추적
-- [ ] 엑셀 다운로드 기능
-- [ ] 알림 기능 (배당 지급일)
-- [ ] 테스트 코드 작성 (목표: 80% 커버리지)
-
-
- 📝 라이선스
-
-MIT License
-
-
-👤 개발자
+👤 Developer
 
 Cheongcel
-- GitHub: [@cheongcel](https://github.com/cheongcel/dividend)
-- Email: andfrank@naver.com
-
-
-
-⭐ 이 프로젝트가 도움이 되었다면 Star를 눌러주세요!
+GitHub: @cheongcel
+Email: andfrank@naver.com
