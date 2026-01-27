@@ -24,6 +24,7 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	implementation 'org.springframework.security:spring-security-crypto'
 
 	// [변경] 야후 라이브러리 삭제하고 Jsoup 추가
 	implementation 'org.jsoup:jsoup:1.17.2'

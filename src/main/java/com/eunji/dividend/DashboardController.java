@@ -101,11 +101,25 @@ public class DashboardController {
         // 월 평균
         BigDecimal monthlyAvg = totalAnnual.divide(new BigDecimal(12), 0, RoundingMode.HALF_UP);
 
+        int stockCount = myStocks.size();
+
+        // ⭐ 분산 투자 상태 메시지
+        String investmentStatus;
+        if (stockCount == 0) {
+            investmentStatus = "주식을 추가해보세요";
+        } else if (stockCount == 1) {
+            investmentStatus = "투자 시작";
+        } else if (stockCount == 2) {
+            investmentStatus = "2개 종목 보유";
+        } else {
+            investmentStatus = "분산 투자 중";
+        }
         // 모델에 추가
         model.addAttribute("totalAnnual", totalAnnual);
         model.addAttribute("monthlyAvg", monthlyAvg);
         model.addAttribute("totalAssetValue", totalAssetValue);
-        model.addAttribute("stockCount", myStocks.size());
+        model.addAttribute("stockCount", stockCount);
+        model.addAttribute("investmentStatus", investmentStatus);  // ⭐ 추가
         model.addAttribute("monthlyTotals", monthlyTotals);
         model.addAttribute("stockDetails", stockDetails);
 

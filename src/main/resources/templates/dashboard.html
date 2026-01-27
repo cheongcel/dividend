@@ -178,6 +178,7 @@
             gap: 12px;
             max-height: 260px;    /* ⭐ 추가 */
             overflow-y: auto;     /* ⭐ 추가 */
+            overflow-x: hidden;
         }
         /* ⭐ 스크롤바 스타일 (새로 추가) */
         .portfolio-list::-webkit-scrollbar {
@@ -418,9 +419,11 @@
                     <span class="stat-unit">원</span>
                 </div>
                 <div class="stat-change">
-                    <span th:if="${totalAssetValue > 0}"
-                          th:text="'배당률 ' + ${#numbers.formatDecimal(totalAnnual / totalAssetValue * 100, 1, 2)} + '%'">
-                        배당률 3.5%
+                    <span th:if="${totalAssetValue > 0}">
+                        배당률 <span th:text="${#numbers.formatDecimal(totalAnnual / totalAssetValue * 100, 1, 2)}">0.00</span>%
+                    </span>
+                    <span th:if="${totalAssetValue == 0}">
+                        주식을 추가해보세요
                     </span>
                 </div>
             </div>
@@ -434,7 +437,7 @@
                     <span class="stat-unit">개</span>
                 </div>
                 <div class="stat-change">
-                    분산 투자 중
+                    <span th:text="${investmentStatus}">분산 투자 중</span>
                 </div>
             </div>
         </div>
