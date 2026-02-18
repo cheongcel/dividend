@@ -3,7 +3,7 @@
 <head>
     <link rel="icon" href="/images/favicon.png">
     <meta charset="UTF-8">
-    <title>DIVY - 경제적 자유</title>
+    <title>DIVY - 배당 목표</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" as="style" crossorigin
           href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
@@ -124,7 +124,7 @@
 
             <a href="/dashboard">홈</a>
             <a href="/calculator">계산기</a>
-            <a href="/goal" style="color:#3182F6">로드맵</a>
+            <a href="/goal" style="color:#3182F6">목표</a>
             <a href="/calendar">캘린더</a>
 
             <!-- ⭐ 추가: 로그인/로그아웃 버튼 -->
@@ -137,7 +137,7 @@
 
 <div class="container">
     <div class="card animate-up">
-        <h2 style="margin: 0; font-size: 22px;">🎯 경제적 자유 목표 설정</h2>
+        <h2 style="margin: 0; font-size: 22px;">🏠 배당 목표</h2>
         <p style="color: #6B7684; margin-top: 10px; font-size: 15px;">
             월 얼마의 배당금을 받고 싶으신가요?
         </p>
@@ -205,9 +205,9 @@
         </div>
 
         <div th:if="${gapAmount <= 0}" style="margin-top: 30px;">
-            <div style="font-size: 50px;">🎉</div>
-            <h3 style="color: #3182F6; margin: 10px 0;">경제적 자유 달성!</h3>
-            <p style="color: #666; font-size: 14px;">축하합니다! 목표를 달성하셨습니다.</p>
+            <div style="font-size: 50px;">🥂</div>
+            <h3 style="color: #3182F6; margin: 10px 0;">경제적 자유에 도착했습니다!</h3>
+            <p style="color: #666; font-size: 14px;">목표를 달성하셨습니다. 이제 더 큰 미래를 그려보셔도 좋습니다.</p>
         </div>
 
         <div style="margin-top: 15px; font-size: 12px; color: #8B95A1; text-align: center; line-height: 1.5;">
