@@ -170,4 +170,8 @@ MIT License
 **Cheongcel**
 - GitHub: [@cheongcel](https://github.com/cheongcel/dividend)
 - Email: andfrank@naver.com
-- 
+
+---
+
+⭐ If this project helped you, please give it a star!
+```
