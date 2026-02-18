@@ -3,7 +3,7 @@
 
 📸 Screenshots
 
-Dashboard
+### Dashboard
 ![Dashboard](screenshots/dashboard.png)
 Real-time portfolio analytics with Chart.js visualization
 
