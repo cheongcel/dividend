@@ -1,6 +1,25 @@
 💰 DIVY - Dividend Calculator
 "Visualize your dividend cash flow in just 3 seconds." An intuitive asset management service designed to eliminate the complexity of dividend tracking and portfolio planning.
 
+📸 Screenshots
+
+Dashboard
+![Dashboard](screenshots/dashboard.png)
+Real-time portfolio analytics with Chart.js visualization
+
+### Calculator
+![Calculator](screenshots/calculator.png)
+Instant dividend calculation for US stocks
+
+### Calendar
+![Calendar](screenshots/calendar.png)
+12-month dividend distribution view
+
+### Goal Tracker
+![Goal](screenshots/goal.png)
+Track your financial independence progress
+
+
 🎯 Strategic Overview
 Many dividend investors struggle with fragmented data across different exchanges and the tedious task of manual calculation in spreadsheets. DIVY provides a seamless, "zero-barrier" experience for data-driven investment.
 
