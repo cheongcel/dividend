@@ -175,3 +175,5 @@ MIT License
 
 ⭐ If this project helped you, please give it a star!
 ```
+
+---
