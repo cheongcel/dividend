@@ -253,35 +253,28 @@
         .card-container .toss-card:nth-child(2) { animation-delay: 0.2s; }
         .card-container .toss-card:nth-child(3) { animation-delay: 0.3s; }
 
+        /* ⭐ 반응형 - 모바일 */
         @media (max-width: 768px) {
             .nav-container {
-                max-width: 600px;  /* ⭐ 추가 */
-                padding: 0 16px;   /* ⭐ 여백 줄임 */
+                flex-wrap: wrap;
             }
 
             .nav-menu {
-                display: flex;  /* ⭐ 보이게! */
+                width: 100%;
+                justify-content: space-around;
                 gap: 8px;
-                align-items: center;
+                padding: 12px 0;
+                flex-wrap: wrap;
             }
 
             .nav-menu a {
-                font-size: 12px;  /* ⭐ 작게 */
-                padding: 4px 6px;
-                white-space: nowrap;
+                font-size: 13px;
+                padding: 6px 10px;
             }
 
             .nav-menu span {
-                display: none;  /* ⭐ "사용자님" 숨김 */
-            }
-
-            /* 로고 크기 조정 */
-            .nav-brand img {
-                height: 28px !important;  /* ⭐ 작게 */
-            }
-
-            .nav-brand span {
-                font-size: 20px !important;  /* ⭐ 작게 */
+                font-size: 12px;
+                display: none;  /* 모바일에서는 "사용자님" 숨김 */
             }
 
             .main-title {
@@ -324,9 +317,9 @@
 <!-- 네비게이션 -->
 <nav class="navbar">
     <div class="nav-container">
-        <a href="/" class="nav-brand" style="display: flex; align-items: center; text-decoration: none;">
+        <a href="/" style="display: flex; align-items: center; text-decoration: none;">
             <img src="/images/favicon.png" alt="DIVY" style="height: 33px;">
-            <span style="font-size: 25px; font-weight: 300; color: #3182F6;">DIVY</span>
+            <span style="font-size: 20px; font-weight: 800; color: #3182F6;">DIVY</span>
         </a>
         <div class="nav-menu">
             <!-- ⭐ 추가: 로그인 상태 표시 -->
