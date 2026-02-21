@@ -254,27 +254,39 @@
         .card-container .toss-card:nth-child(3) { animation-delay: 0.3s; }
 
         /* ⭐ 반응형 - 모바일 */
+        /* ⭐ 반응형 - 모바일 (이 부분 전체 교체) */
         @media (max-width: 768px) {
             .nav-container {
-                flex-wrap: wrap;
+                max-width: 600px;
+                padding: 0 16px;
+                /* flex-wrap 삭제! */
             }
 
             .nav-menu {
-                width: 100%;
-                justify-content: space-around;
+                display: flex;
                 gap: 8px;
-                padding: 12px 0;
-                flex-wrap: wrap;
+                align-items: center;
+                /* width: 100% 삭제! */
+                /* padding 삭제! */
             }
 
             .nav-menu a {
-                font-size: 13px;
-                padding: 6px 10px;
+                font-size: 12px;
+                padding: 4px 6px;
+                white-space: nowrap;
             }
 
             .nav-menu span {
-                font-size: 12px;
-                display: none;  /* 모바일에서는 "사용자님" 숨김 */
+                display: none;  /* 사용자님 숨김 */
+            }
+
+            /* 로고 크기 조정 */
+            img[alt="DIVY"] {
+                height: 28px !important;
+            }
+
+            .nav-container a span {
+                font-size: 20px !important;
             }
 
             .main-title {
@@ -319,10 +331,9 @@
     <div class="nav-container">
         <a href="/" style="display: flex; align-items: center; text-decoration: none;">
             <img src="/images/favicon.png" alt="DIVY" style="height: 33px;">
-            <span style="font-size: 20px; font-weight: 800; color: #3182F6;">DIVY</span>
+            <span style="font-size: 25px; font-weight: 300; color: #3182F6;">DIVY</span>
         </a>
         <div class="nav-menu">
-            <!-- ⭐ 추가: 로그인 상태 표시 -->
             <span th:if="${session.userId != null}"
                   style="color: #666; font-weight: 600; margin-right: 15px; font-size: 14px;">
                 <span th:text="${session.userName}">사용자</span>님
@@ -333,7 +344,6 @@
             <a href="/goal">목표</a>
             <a href="/calendar">캘린더</a>
 
-            <!-- ⭐ 추가: 로그인/로그아웃 버튼 -->
             <a th:if="${session.userId == null}" href="/login">로그인</a>
             <a th:if="${session.userId != null}" href="/logout"
                style="color: #FF6B6B;">로그아웃</a>
