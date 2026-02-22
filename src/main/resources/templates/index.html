@@ -8,30 +8,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
+        /* ========== 공통 설정 (다른 페이지와 스크롤 동기화) ========== */
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", Roboto, "Noto Sans KR", sans-serif;
+            font-family: "Pretendard", sans-serif;
             background-color: #F2F4F6;
+            color: #333;
             min-height: 100vh;
+            overflow-y: scroll; /* ⭐ 스크롤 밀림 방지 완벽 통일 */
         }
 
-        /* 네비게이션 */
+        /* ========== 네비게이션 (구조는 동일하되 넓이만 1200px로 확장) ========== */
         .navbar {
-            background-color: #ffffff;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-            padding: 16px 0;
+            background-color: white;
+            padding: 15px 0; /* 다른 페이지와 동일한 패딩 */
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05); /* 그림자 농도 통일 */
             position: sticky;
             top: 0;
             z-index: 100;
         }
 
         .nav-container {
-            max-width: 1200px;
+            max-width: 1200px; /* 인덱스 전용 넓은 레이아웃 */
             margin: 0 auto;
             padding: 0 24px;
             display: flex;
@@ -41,36 +40,22 @@
 
         .nav-brand {
             font-weight: 800;
-            font-size: 24px;
+            font-size: 20px;
             color: #3182F6;
             text-decoration: none;
         }
 
         .nav-menu {
             display: flex;
-            gap: 32px;
-            list-style: none;
             align-items: center;
         }
 
-        .nav-link {
-            color: #4E5968;
-            font-weight: 600;
-            font-size: 16px;
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-
-        .nav-link:hover {
-            color: #3182F6;
-        }
-
-        /* ⭐ 네비 메뉴 링크 스타일 */
         .nav-menu a {
-            color: #4E5968;
-            font-weight: 600;
-            font-size: 16px;
             text-decoration: none;
+            color: #666; /* 색상 통일 */
+            font-weight: 600;
+            margin-left: 15px; /* gap 대신 마진으로 다른 페이지와 구조 통일 */
+            font-size: 14px;
             transition: color 0.2s;
             white-space: nowrap;
         }
@@ -79,7 +64,7 @@
             color: #3182F6;
         }
 
-        /* 메인 컨텐츠 */
+        /* ========== 메인 컨텐츠 ========== */
         .main-container {
             max-width: 1200px;
             margin: 0 auto;
@@ -131,10 +116,7 @@
         .toss-card::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            top: 0; left: 0; right: 0; bottom: 0;
             background: linear-gradient(135deg, rgba(49, 130, 246, 0.03) 0%, rgba(49, 130, 246, 0) 100%);
             opacity: 0;
             transition: opacity 0.3s ease;
@@ -146,13 +128,8 @@
             border-color: #3182F6;
         }
 
-        .toss-card:hover::before {
-            opacity: 1;
-        }
-
-        .toss-card:active {
-            transform: translateY(-4px);
-        }
+        .toss-card:hover::before { opacity: 1; }
+        .toss-card:active { transform: translateY(-4px); }
 
         .card-icon {
             font-size: 48px;
@@ -225,103 +202,38 @@
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
         }
 
-        .toss-btn:active {
-            transform: scale(0.98);
-        }
+        .toss-btn:active { transform: scale(0.98); }
 
         /* 로딩 애니메이션 */
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .main-title, .sub-title {
-            animation: fadeInUp 0.8s ease-out;
-        }
-
-        .card-container .toss-card {
-            animation: fadeInUp 0.6s ease-out backwards;
-        }
-
+        .main-title, .sub-title { animation: fadeInUp 0.8s ease-out; }
+        .card-container .toss-card { animation: fadeInUp 0.6s ease-out backwards; }
         .card-container .toss-card:nth-child(1) { animation-delay: 0.1s; }
         .card-container .toss-card:nth-child(2) { animation-delay: 0.2s; }
         .card-container .toss-card:nth-child(3) { animation-delay: 0.3s; }
 
-        /* ⭐ 반응형 - 모바일 */
+        /* ⭐ 반응형 - 모바일 (다른 페이지 네비바와 완벽 통일) */
+        /* ⭐ 반응형 - 모바일 (네비바는 다른 페이지처럼 그대로 두고, 메인 내용만 모바일에 맞춤) */
         @media (max-width: 768px) {
-            .nav-container {
-                max-width: 600px;
-                padding: 0 16px;
-            }
+            /* 네비바 관련 속성 싹 삭제 (다른 페이지와 100% 통일) */
 
-            .nav-menu {
-                display: flex;
-                gap: 8px;
-                align-items: center;
-            }
-
-            .nav-menu a {
-                font-size: 12px;
-                padding: 4px 6px;
-                white-space: nowrap;
-            }
-
-            .nav-menu span {
-                display: none;
-            }
-
-            img[alt="DIVY"] {
-                height: 28px !important;
-            }
-
-            .nav-container a span {
-                font-size: 20px !important;
-            }
-
-            .main-title {
-                font-size: 32px;
-                padding: 0 12px;
-            }
-
-            .sub-title {
-                font-size: 16px;
-                padding: 0 12px;
-            }
-
-            .card-container {
-                grid-template-columns: 1fr;
-                padding: 0 12px;
-            }
-
-            .cta-section {
-                margin-top: 60px;
-                padding: 40px 20px;
-            }
-
-            .cta-title {
-                font-size: 24px;
-            }
-
-            .cta-desc {
-                font-size: 15px;
-            }
-
-            .toss-btn {
-                padding: 14px 32px;
-                font-size: 16px;
-            }
+            /* 아래는 인덱스 페이지의 메인 컨텐츠(큰 글씨, 카드 등)가 모바일에서 안 깨지게 하는 코드이므로 유지 */
+            .main-title { font-size: 32px; padding: 0 12px; }
+            .sub-title { font-size: 16px; padding: 0 12px; }
+            .card-container { grid-template-columns: 1fr; padding: 0 12px; }
+            .cta-section { margin-top: 60px; padding: 40px 20px; }
+            .cta-title { font-size: 24px; }
+            .cta-desc { font-size: 15px; }
+            .toss-btn { padding: 14px 32px; font-size: 16px; }
         }
     </style>
 </head>
 <body>
 
-<!-- 네비게이션 -->
 <nav class="navbar">
     <div class="nav-container">
         <a href="/" class="nav-brand" style="display: flex; align-items: center; text-decoration: none;">
@@ -345,12 +257,11 @@
         </div>
     </div>
 </nav>
-<!-- 메인 컨텐츠 -->
+
 <div class="main-container">
     <h1 class="main-title">모든 투자의 시작,<br>배당금부터 알아볼까요?</h1>
     <p class="sub-title">내 자산이 매달 얼마나 불어나는지<br>가장 정확하게 알려드릴게요.</p>
 
-    <!-- 카드 섹션 -->
     <div class="card-container">
         <a href="/calculator" class="toss-card">
             <span class="card-icon">📊</span>
@@ -366,22 +277,23 @@
             <div class="card-desc" style="width: 100%; text-align: left;">
                 월별 배당금<br>달성률을 확인하세요
             </div>
-        </a> <a href="/calendar" class="toss-card">
-        <span class="card-icon">📅</span>
-        <div class="card-title">배당 캘린더</div>
-        <div class="card-desc" style="width: 100%; text-align: left;">
-            이번년도 내 배당금을<br>캘린더로 한눈에 확인하세요
-        </div>
-    </a> </div>
+        </a>
 
-    <!-- CTA 섹션 -->
+        <a href="/calendar" class="toss-card">
+            <span class="card-icon">📅</span>
+            <div class="card-title">배당 캘린더</div>
+            <div class="card-desc" style="width: 100%; text-align: left;">
+                이번년도 내 배당금을<br>캘린더로 한눈에 확인하세요
+            </div>
+        </a>
+    </div>
+
     <div class="cta-section">
         <h2 class="cta-title">지금 바로 시작해보세요</h2>
         <p class="cta-desc">복잡한 계산은 이제 그만, 3초면 충분합니다</p>
         <a href="/calculator" class="toss-btn">내 배당금 확인하기 →</a>
     </div>
 </div>
-
 
 </body>
 </html>
