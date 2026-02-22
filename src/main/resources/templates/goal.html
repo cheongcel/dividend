@@ -9,6 +9,7 @@
           href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
 
     <style>
+        /* ========== 공통 & 네비바 (calculator와 완벽 통일) ========== */
         body { margin: 0; padding: 0; font-family: "Pretendard", sans-serif;
             background-color: #F2F4F6; color: #333; }
         .navbar { background-color: white; padding: 15px 0;
@@ -19,13 +20,13 @@
             align-items: center; padding: 0 20px; }
         .nav-brand { font-weight: 800; font-size: 20px;
             color: #3182F6; text-decoration: none; }
-        .nav-menu { display: flex; align-items: center; }
         .nav-menu a { text-decoration: none; color: #666;
             font-weight: 600; margin-left: 15px;
             font-size: 14px; transition: color 0.2s; }
         .nav-menu a:hover { color: #3182F6; }
         .container { max-width: 600px; margin: 30px auto; padding: 0 20px; }
 
+        /* ========== goal 페이지 전용 스타일 ========== */
         .card { background: white; padding: 30px; border-radius: 24px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 20px; text-align: center; }
 
@@ -66,7 +67,6 @@
             display: inline-block; margin-bottom: 10px;
         }
 
-        /* ⭐ 블러 처리 스타일 */
         .blur-overlay {
             position: relative;
         }
@@ -116,7 +116,6 @@
             <span style="font-size: 25px; font-weight: 300; color: #3182F6;">DIVY</span>
         </a>
         <div class="nav-menu">
-            <!-- ⭐ 추가: 로그인 상태 표시 -->
             <span th:if="${session.userId != null}"
                   style="color: #666; font-weight: 600; margin-right: 15px; font-size: 14px;">
                 <span th:text="${session.userName}">사용자</span>님
@@ -127,7 +126,6 @@
             <a href="/goal" style="color:#3182F6">목표</a>
             <a href="/calendar">캘린더</a>
 
-            <!-- ⭐ 추가: 로그인/로그아웃 버튼 -->
             <a th:if="${session.userId == null}" href="/login">로그인</a>
             <a th:if="${session.userId != null}" href="/logout"
                style="color: #FF6B6B;">로그아웃</a>
@@ -152,11 +150,9 @@
         </form>
     </div>
 
-    <!-- ⭐ 달성률 카드: 비로그인 시 블러 처리 -->
     <div class="card animate-up" th:if="${targetMonthly > 0}"
          th:classappend="${session.userId == null} ? 'blur-overlay' : ''">
 
-        <!-- ⭐ 비로그인 시 표시되는 메시지 -->
         <div th:if="${session.userId == null}" class="blur-message">
             <div style="font-size: 24px; margin-bottom: 15px;">🔒</div>
             <div style="font-size: 16px; font-weight: 700; color: #333; margin-bottom: 12px;">
@@ -170,7 +166,6 @@
             </a>
         </div>
 
-        <!-- ⭐ 실제 콘텐츠 (로그인 시 정상 표시, 비로그인 시 블러 처리됨) -->
         <div style="font-size: 14px; color: #6B7684;">현재 달성률</div>
         <div class="percent-badge" th:text="${progressPercent} + '%'">0%</div>
 

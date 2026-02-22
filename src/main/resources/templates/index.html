@@ -254,20 +254,16 @@
         .card-container .toss-card:nth-child(3) { animation-delay: 0.3s; }
 
         /* ⭐ 반응형 - 모바일 */
-        /* ⭐ 반응형 - 모바일 (이 부분 전체 교체) */
         @media (max-width: 768px) {
             .nav-container {
                 max-width: 600px;
                 padding: 0 16px;
-                /* flex-wrap 삭제! */
             }
 
             .nav-menu {
                 display: flex;
                 gap: 8px;
                 align-items: center;
-                /* width: 100% 삭제! */
-                /* padding 삭제! */
             }
 
             .nav-menu a {
@@ -277,10 +273,9 @@
             }
 
             .nav-menu span {
-                display: none;  /* 사용자님 숨김 */
+                display: none;
             }
 
-            /* 로고 크기 조정 */
             img[alt="DIVY"] {
                 height: 28px !important;
             }
@@ -329,7 +324,7 @@
 <!-- 네비게이션 -->
 <nav class="navbar">
     <div class="nav-container">
-        <a href="/" style="display: flex; align-items: center; text-decoration: none;">
+        <a href="/" class="nav-brand" style="display: flex; align-items: center; text-decoration: none;">
             <img src="/images/favicon.png" alt="DIVY" style="height: 33px;">
             <span style="font-size: 25px; font-weight: 300; color: #3182F6;">DIVY</span>
         </a>
