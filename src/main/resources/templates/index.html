@@ -10,27 +10,27 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        /* ========== 공통 설정 (다른 페이지와 스크롤 동기화) ========== */
+        /* ========== 공통 설정 ========== */
         body {
             font-family: "Pretendard", sans-serif;
             background-color: #F2F4F6;
             color: #333;
             min-height: 100vh;
-            overflow-y: scroll; /* ⭐ 스크롤 밀림 방지 완벽 통일 */
+            overflow-y: scroll;
         }
 
-        /* ========== 네비게이션 (구조는 동일하되 넓이만 1200px로 확장) ========== */
+        /* ========== 네비게이션 ========== */
         .navbar {
             background-color: white;
-            padding: 15px 0; /* 다른 페이지와 동일한 패딩 */
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05); /* 그림자 농도 통일 */
+            padding: 15px 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
             position: sticky;
             top: 0;
             z-index: 100;
         }
 
         .nav-container {
-            max-width: 1200px; /* 인덱스 전용 넓은 레이아웃 */
+            max-width: 1200px;
             margin: 0 auto;
             padding: 0 24px;
             display: flex;
@@ -48,13 +48,13 @@
         .nav-menu {
             display: flex;
             align-items: center;
+            gap: 15px;  /* ⭐ 추가 */
         }
 
         .nav-menu a {
             text-decoration: none;
-            color: #666; /* 색상 통일 */
+            color: #666;
             font-weight: 600;
-            margin-left: 15px; /* gap 대신 마진으로 다른 페이지와 구조 통일 */
             font-size: 14px;
             transition: color 0.2s;
             white-space: nowrap;
@@ -216,12 +216,8 @@
         .card-container .toss-card:nth-child(2) { animation-delay: 0.2s; }
         .card-container .toss-card:nth-child(3) { animation-delay: 0.3s; }
 
-        /* ⭐ 반응형 - 모바일 (다른 페이지 네비바와 완벽 통일) */
-        /* ⭐ 반응형 - 모바일 (네비바는 다른 페이지처럼 그대로 두고, 메인 내용만 모바일에 맞춤) */
+        /* ⭐ 반응형 - 모바일 */
         @media (max-width: 768px) {
-            /* 네비바 관련 속성 싹 삭제 (다른 페이지와 100% 통일) */
-
-            /* 아래는 인덱스 페이지의 메인 컨텐츠(큰 글씨, 카드 등)가 모바일에서 안 깨지게 하는 코드이므로 유지 */
             .main-title { font-size: 32px; padding: 0 12px; }
             .sub-title { font-size: 16px; padding: 0 12px; }
             .card-container { grid-template-columns: 1fr; padding: 0 12px; }
@@ -241,10 +237,10 @@
             <span style="font-size: 25px; font-weight: 300; color: #3182F6;">DIVY</span>
         </a>
         <div class="nav-menu">
-            <span th:if="${session.userId != null}"
-                  style="color: #666; font-weight: 600; margin-right: 15px; font-size: 14px;">
-                <span th:text="${session.userName}">사용자</span>님
-            </span>
+    <span th:if="${session.userId != null}"
+          style="color: #666; font-weight: 600; margin-right: 0; font-size: 14px;">
+        <span th:text="${session.userName}">사용자</span>님
+    </span>
 
             <a href="/dashboard">홈</a>
             <a href="/calculator">계산기</a>
