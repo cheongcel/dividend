@@ -32,7 +32,7 @@
         .nav-container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 24px;
+            padding: 0 20px;  /* ⭐ 다른 페이지와 동일 */
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -48,16 +48,16 @@
         .nav-menu {
             display: flex;
             align-items: center;
-            gap: 15px;  /* ⭐ 추가 */
+            /* gap: 15px; ← 삭제! */
         }
 
         .nav-menu a {
             text-decoration: none;
             color: #666;
             font-weight: 600;
+            margin-left: 15px;  /* ⭐ 추가! (다른 페이지와 동일) */
             font-size: 14px;
             transition: color 0.2s;
-            white-space: nowrap;
         }
 
         .nav-menu a:hover {
@@ -238,7 +238,7 @@
         </a>
         <div class="nav-menu">
     <span th:if="${session.userId != null}"
-          style="color: #666; font-weight: 600; margin-right: 0; font-size: 14px;">
+          style="color: #666; font-weight: 600; margin-right: 15px; font-size: 14px;">
         <span th:text="${session.userName}">사용자</span>님
     </span>
 
