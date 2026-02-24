@@ -114,7 +114,10 @@
 
 <div class="login-container">
     <div class="logo">
-        <div class="logo-text">DIVY</div>
+        <!-- ⭐ 여기에 <a> 태그 추가 -->
+        <a href="/" style="display: flex; align-items: center; justify-content: center; gap: 4px; text-decoration: none;">
+            <div class="logo-text">DIVY</div>
+        </a>
         <p style="color: #8B95A1; font-size: 14px; margin-top: 5px;">배당금 계산 & 관리 서비스</p>
     </div>
 
@@ -139,6 +142,7 @@
                    id="password"
                    name="password"
                    placeholder="4자 이상"
+                   minlength="4"
                    required>
         </div>
 
