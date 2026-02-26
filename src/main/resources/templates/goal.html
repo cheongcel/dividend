@@ -105,6 +105,31 @@
 
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .animate-up { animation: slideUp 0.5s ease-out; }
+        /* ⭐ 모바일 반응형 */
+        @media (max-width: 768px) {
+            .nav-container {
+                padding: 0 12px;
+            }
+
+            .nav-menu {
+                gap: 8px;
+            }
+
+            .nav-menu a {
+                font-size: 12px;
+                margin-left: 8px;
+                white-space: nowrap;
+            }
+
+            img[alt="DIVY"] {
+                height: 28px !important;
+            }
+
+            .nav-container a span,
+            .nav-brand span {
+                font-size: 20px !important;
+            }
+        }
     </style>
 </head>
 <body>

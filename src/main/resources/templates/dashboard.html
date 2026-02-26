@@ -325,6 +325,31 @@
             .grid-3 { grid-template-columns: 1fr; }
             .grid-2 { grid-template-columns: 1fr; }
         }
+        /* ⭐ 모바일 반응형 */
+        @media (max-width: 768px) {
+            .nav-container {
+                padding: 0 12px;
+            }
+
+            .nav-menu {
+                gap: 8px;
+            }
+
+            .nav-menu a {
+                font-size: 12px;
+                margin-left: 8px;
+                white-space: nowrap;
+            }
+
+            img[alt="DIVY"] {
+                height: 28px !important;
+            }
+
+            .nav-container a span,
+            .nav-brand span {
+                font-size: 20px !important;
+            }
+        }
 
         /* 빈 상태 */
         .empty-state {
