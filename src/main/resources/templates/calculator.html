@@ -274,9 +274,9 @@
     </div>
 </div>
 
-<script>
+<script th:inline="javascript">
     // ========== API 키 설정 ==========
-    let API_KEY = /*[[${apiKey}]]*/ "DEMO_KEY";
+    let API_KEY = [[${apiKey}]];
     console.log('✅ API 키 로드 완료');
 
     // ========== 종목 데이터 ==========
