@@ -75,17 +75,17 @@
             color: #8B95A1;
         }
 
-        /* 그리드 레이아웃 */
-        .grid-3 {
+        /* ⭐ 그리드 레이아웃 수정 */
+        .grid-2-equal {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(2, 1fr); /* 정확히 1:1 반반 비율! */
             gap: 20px;
             margin-bottom: 20px;
         }
 
         .grid-2 {
             display: grid;
-            grid-template-columns: 2.5fr 1fr;
+            grid-template-columns: 2.5fr 1fr; /* 차트(넓게) : 리스트(좁게) */
             gap: 20px;
             margin-bottom: 20px;
         }
@@ -176,11 +176,11 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
-            max-height: 260px;    /* ⭐ 추가 */
-            overflow-y: auto;     /* ⭐ 추가 */
+            max-height: 260px;
+            overflow-y: auto;
             overflow-x: hidden;
         }
-        /* ⭐ 스크롤바 스타일 (새로 추가) */
+
         .portfolio-list::-webkit-scrollbar {
             width: 6px;
         }
@@ -314,66 +314,30 @@
         }
 
         /* 애니메이션 딜레이 */
-        .grid-3 .card:nth-child(1) { animation-delay: 0.1s; }
-        .grid-3 .card:nth-child(2) { animation-delay: 0.2s; }
-        .grid-3 .card:nth-child(3) { animation-delay: 0.3s; }
-        .grid-2 .card:nth-child(1) { animation-delay: 0.4s; }
-        .grid-2 .card:nth-child(2) { animation-delay: 0.5s; }
+        .grid-2-equal .card:nth-child(1) { animation-delay: 0.1s; }
+        .grid-2-equal .card:nth-child(2) { animation-delay: 0.2s; }
+        .grid-2 .card:nth-child(1) { animation-delay: 0.3s; }
+        .grid-2 .card:nth-child(2) { animation-delay: 0.4s; }
 
         /* 반응형 */
         @media (max-width: 1024px) {
-            .grid-3 { grid-template-columns: 1fr; }
+            .grid-2-equal { grid-template-columns: 1fr; }
             .grid-2 { grid-template-columns: 1fr; }
         }
-        /* ⭐ 모바일 반응형 */
+
         @media (max-width: 768px) {
-            .nav-container {
-                padding: 0 12px;
-            }
-
-            .nav-menu {
-                gap: 8px;
-            }
-
-            .nav-menu a {
-                font-size: 12px;
-                margin-left: 8px;
-                white-space: nowrap;
-            }
-
-            img[alt="DIVY"] {
-                height: 28px !important;
-            }
-
-            .nav-container a span,
-            .nav-brand span {
-                font-size: 20px !important;
-            }
+            .nav-container { padding: 0 12px; }
+            .nav-menu { gap: 8px; }
+            .nav-menu a { font-size: 12px; margin-left: 8px; white-space: nowrap; }
+            img[alt="DIVY"] { height: 28px !important; }
+            .nav-container a span, .nav-brand span { font-size: 20px !important; }
         }
 
         /* 빈 상태 */
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-        }
-
-        .empty-icon {
-            font-size: 64px;
-            margin-bottom: 20px;
-        }
-
-        .empty-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: #191F28;
-            margin-bottom: 12px;
-        }
-
-        .empty-desc {
-            font-size: 15px;
-            color: #8B95A1;
-            margin-bottom: 32px;
-        }
+        .empty-state { text-align: center; padding: 60px 20px; }
+        .empty-icon { font-size: 64px; margin-bottom: 20px; }
+        .empty-title { font-size: 20px; font-weight: 700; color: #191F28; margin-bottom: 12px; }
+        .empty-desc { font-size: 15px; color: #8B95A1; margin-bottom: 32px; }
     </style>
 </head>
 <body>
@@ -395,7 +359,6 @@
 </nav>
 
 <div class="container">
-    <!-- 헤더 -->
     <div class="dashboard-header">
         <div class="welcome-text">
             👋 <span th:text="${session.userName}">사용자</span>님, 환영합니다
@@ -403,7 +366,6 @@
         <div class="welcome-sub">오늘도 당신의 자산이 일하고 있습니다</div>
     </div>
 
-    <!-- 빈 상태 -->
     <div th:if="${stockCount == 0}" class="card">
         <div class="empty-state">
             <div class="empty-icon">📭</div>
@@ -415,10 +377,8 @@
         </div>
     </div>
 
-    <!-- 데이터 있을 때 -->
     <div th:if="${stockCount > 0}">
-        <!-- 3개 숫자 카드 -->
-        <div class="grid-3">
+        <div class="grid-2-equal">
             <div class="card stat-card">
                 <div class="stat-label">
                     💰 연간 예상 배당금
@@ -429,24 +389,6 @@
                 </div>
                 <div class="stat-change">
                     월 평균 <span th:text="${#numbers.formatInteger(monthlyAvg, 0, 'COMMA')}">0</span>원 수령
-                </div>
-            </div>
-
-            <div class="card stat-card">
-                <div class="stat-label">
-                    📊 총 자산 평가액
-                </div>
-                <div class="stat-value">
-                    <span th:text="${#numbers.formatInteger(totalAssetValue, 0, 'COMMA')}">0</span>
-                    <span class="stat-unit">원</span>
-                </div>
-                <div class="stat-change">
-                    <span th:if="${totalAssetValue > 0}">
-                        배당률 <span th:text="${#numbers.formatDecimal(totalAnnual / totalAssetValue * 100, 1, 2)}">0.00</span>%
-                    </span>
-                    <span th:if="${totalAssetValue == 0}">
-                        주식을 추가해보세요
-                    </span>
                 </div>
             </div>
 
@@ -464,9 +406,7 @@
             </div>
         </div>
 
-        <!-- ⭐ 차트 + 포트폴리오 (2:1 비율로 나란히) -->
         <div class="grid-2">
-            <!-- 월별 차트 (2칸) -->
             <div class="card">
                 <div class="card-header">
                     <div class="card-title">📅 월별 배당금 추이</div>
@@ -476,7 +416,6 @@
                 </div>
             </div>
 
-            <!-- 포트폴리오 리스트 (1칸) -->
             <div class="card">
                 <div class="card-header">
                     <div class="card-title">💼 내 포트폴리오</div>
@@ -506,38 +445,36 @@
             </div>
         </div>
 
-        <!-- ⭐ 목표 달성률 프로그레스 바 (독립 카드, 전체 너비) -->
-        <div class="card" style="animation: fadeInUp 0.7s ease-out backwards; animation-delay: 0.6s;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                <div>
-                    <div style="font-size: 24px; font-weight: 800; color: #3182F6;">
-                        0% 달성
-                    </div>
+        <a href="/goal" style="text-decoration: none; color: inherit; display: block; animation: fadeInUp 0.7s ease-out backwards; animation-delay: 0.5s;">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <div>
+                        <div style="font-size: 24px; font-weight: 800; color: #3182F6;">
+                            <!-- 기존 하드코딩 "0% 달성" → 동적으로 -->
+                            <span th:text="${achieveRate} + '% 달성'">0% 달성</span>
+                        </div>
+
+                        <!-- 목표 금액 표시 -->
+                        <span>목표:
+    <b style="color: #191F28;"
+       th:text="${goalTargetWon > 0} ? ${#numbers.formatInteger(goalTargetWon, 0, 'COMMA')} + '원' : '미설정'">
+        미설정
+    </b>
+</span>
                 </div>
-                <a href="/goal" style="padding: 10px 20px; background: #F8FAFB; color: #3182F6; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 14px; transition: 0.2s;">
-                    목표 설정하기
-                </a>
-            </div>
 
-            <!-- 프로그레스 바 -->
-            <div style="background: #E5E8EB; border-radius: 20px; height: 28px; overflow: hidden; position: relative; margin-bottom: 12px;">
-                <div id="goalProgressBar" style="
-                    background: linear-gradient(90deg, #3182F6, #6B9EFF);
-                    height: 100%;
-                    border-radius: 20px;
-                    width: 0%;
-                    transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
-                "></div>
-            </div>
+                <div style="background: #E5E8EB; border-radius: 20px; height: 28px; overflow: hidden; position: relative; margin-bottom: 12px;">
+                    <div id="goalProgressBar"
+                         th:style="'background: linear-gradient(90deg, #3182F6, #6B9EFF); height: 100%; border-radius: 20px; transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1); width: ' + (${targetMonthly != null and targetMonthly > 0 ? progressPercent : 0}) + '%'"></div>
+                </div>
 
-            <!-- 현재/목표 금액 -->
-            <div style="display: flex; justify-content: space-between; font-size: 13px; color: #8B95A1;">
-                <span>현재: <b style="color: #191F28;"><span th:text="${#numbers.formatInteger(monthlyAvg, 0, 'COMMA')}">0</span>원</b></span>
-                <span>목표: <b style="color: #191F28;">미설정</b></span>
+                <div style="display: flex; justify-content: space-between; font-size: 13px; color: #8B95A1;">
+                    <span>현재: <b style="color: #191F28;"><span th:text="${#numbers.formatInteger(monthlyAvg, 0, 'COMMA')}">0</span>원</b></span>
+                    <span>목표: <b style="color: #191F28;" th:text="${targetMonthly != null and targetMonthly > 0 ? #numbers.formatInteger(targetMonthly * 10000, 0, 'COMMA') + '원' : '미설정'}">미설정</b></span>
+                </div>
             </div>
-        </div>
+        </a>
 
-        <!-- 빠른 액션 -->
         <div class="action-buttons">
             <a href="/calculator" class="action-btn action-btn-primary">
                 ➕ 주식 추가하기
@@ -553,7 +490,7 @@
 </div>
 
 <script th:inline="javascript">
-    const monthlyData = /*[[${monthlyTotals}]]*/ [];
+    const achieveRate = /*[[${achieveRate}]]*/ 0;
 
     const ctx = document.getElementById('monthlyChart');
     if (ctx) {
@@ -605,6 +542,14 @@
             }
         });
     }
+    const achieveRate = /*[[${achieveRate}]]*/ 0;
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            const bar = document.getElementById('goalProgressBar');
+            if (bar) bar.style.width = achieveRate + '%';
+        }, 400);
+    });
+
 </script>
 
 </body>

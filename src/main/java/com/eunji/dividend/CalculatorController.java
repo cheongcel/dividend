@@ -214,6 +214,10 @@ public class CalculatorController {
         // ⭐ 로그인 체크 제거! (페이지는 누구나 볼 수 있게)
         Long userId = (Long) session.getAttribute("userId");
 
+        if (targetMonthly > 0) {
+            session.setAttribute("goalTarget", (long) targetMonthly);
+        }
+
         List<UserPortfolio> myStocks = new ArrayList<>();
         BigDecimal currentAnnualDividend = BigDecimal.ZERO;
 
