@@ -3,6 +3,7 @@ package com.eunji.dividend;
 import com.eunji.dividend.service.DividendService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,13 +23,19 @@ public class CalculatorController {
     private final DividendRepository dividendRepository;
     private final UserPortfolioRepository userPortfolioRepository;
 
+    // ⭐ API 키 주입
+    @Value("${api.key:DEMO_KEY}")
+    private String apiKey;
+
     @GetMapping("/")
     public String showMain() {
         return "index";
     }
 
     @GetMapping("/calculator")
-    public String showCalculator() {
+    public String showCalculator(Model model) {
+        // ⭐ API 키 전달
+        model.addAttribute("apiKey", apiKey);
         return "calculator";
     }
 
@@ -46,6 +53,9 @@ public class CalculatorController {
             model.addAttribute("searchTicker", ticker);
             model.addAttribute("searchQuantity", quantity);
         }
+
+        // ⭐ API 키 전달
+        model.addAttribute("apiKey", apiKey);
         return "calculator";
     }
 
@@ -71,6 +81,7 @@ public class CalculatorController {
 
         if (result.containsKey("error")) {
             model.addAttribute("error", result.get("error"));
+            model.addAttribute("apiKey", apiKey);
             return "calculator"; // 에러 시 다시 계산기로
         }
 
@@ -103,6 +114,7 @@ public class CalculatorController {
 
         if (result.containsKey("error")) {
             model.addAttribute("error", result.get("error"));
+            model.addAttribute("apiKey", apiKey);
             return "calculator";
         }
 
