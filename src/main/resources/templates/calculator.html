@@ -315,9 +315,8 @@
     async function getExchangeRate() {
         const cached = localStorage.getItem('exchangeRate');
         const cacheTime = localStorage.getItem('exchangeRateTime');
-        const ONE_HOUR = 3600000; // 1시간
+        const ONE_HOUR = 3600000;
 
-        // 캐시 유효성 확인
         if (cached && cacheTime && (Date.now() - parseInt(cacheTime)) < ONE_HOUR) {
             console.log('💾 캐시된 환율 사용:', cached);
             return parseFloat(cached);
@@ -329,7 +328,6 @@
             const data = await res.json();
             const rate = data.rates.KRW;
 
-            // 캐시 저장
             localStorage.setItem('exchangeRate', rate);
             localStorage.setItem('exchangeRateTime', Date.now());
             console.log('✅ 환율 업데이트:', rate);
@@ -337,23 +335,20 @@
             return rate;
         } catch (error) {
             console.warn('⚠️ 환율 조회 실패, 기본값 사용');
-            return cached ? parseFloat(cached) : 1450; // 캐시 우선, 없으면 기본값
+            return cached ? parseFloat(cached) : 1450;
         }
     }
 
-    // ========== 세금 계산 ==========
     function calculateTax(dividend, isKorean) {
-        const taxRate = isKorean ? 0.154 : 0.15; // 한국 15.4%, 미국 15%
+        const taxRate = isKorean ? 0.154 : 0.15;
         const tax = Math.round(dividend * taxRate);
         const afterTax = dividend - tax;
         return { tax, afterTax, rate: isKorean ? '15.4%' : '15%' };
     }
 
-    // ========== 입력 유효성 검증 ==========
     function validateInputs() {
         let isValid = true;
 
-        // 종목
         const ticker = document.getElementById('inputTicker').value.trim();
         const tickerError = document.getElementById('tickerError');
         if (!ticker) {
@@ -363,7 +358,6 @@
             hideError('inputTicker', tickerError);
         }
 
-        // 수량
         const quantity = parseFloat(document.getElementById('inputQuantity').value);
         const quantityError = document.getElementById('quantityError');
         if (!quantity || quantity < 1 || quantity > 1000000) {
@@ -373,7 +367,6 @@
             hideError('inputQuantity', quantityError);
         }
 
-        // 배당률
         const yieldValue = parseFloat(document.getElementById('inputYield').value);
         const yieldError = document.getElementById('yieldError');
         if (isNaN(yieldValue) || yieldValue < 0 || yieldValue > 50) {
@@ -400,7 +393,6 @@
         errorElement.style.display = 'none';
     }
 
-    // ========== 종목 검색 (Debounce) ==========
     function searchStocks() {
         clearTimeout(searchTimeout);
 
@@ -430,7 +422,7 @@
                 }
             }
             suggestionsBox.style.display = matchCount > 0 ? "block" : "none";
-        }, 200); // 200ms Debounce
+        }, 200);
     }
 
     function selectStock(ticker) {
@@ -442,12 +434,10 @@
         hideError('inputTicker', document.getElementById('tickerError'));
     }
 
-    // ========== Enter 키 처리 ==========
     function checkEnter(event) {
         if (event.key === 'Enter') calculateDividend();
     }
 
-    // ========== 외부 클릭 시 자동완성 닫기 ==========
     document.addEventListener('click', function(e) {
         const box = document.getElementById('suggestions');
         const input = document.getElementById('inputTicker');
@@ -456,14 +446,12 @@
         }
     });
 
-    // ========== Esc 키로 자동완성 닫기 ==========
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             document.getElementById('suggestions').style.display = 'none';
         }
     });
 
-    // ========== 로딩 상태 ==========
     function showLoading(isLoading) {
         const btn = document.getElementById('calcBtn');
         document.getElementById('btnText').style.display = isLoading ? 'none' : 'inline';
@@ -472,9 +460,7 @@
         btn.setAttribute('aria-busy', isLoading);
     }
 
-    // ========== 메인 계산 함수 ==========
     async function calculateDividend() {
-        // 입력 검증
         if (!validateInputs()) {
             return;
         }
@@ -485,7 +471,6 @@
 
         let stockInfo = STOCK_DATA[ticker];
 
-        // 배당률 자동 감지 (기본값 3.5%인 경우만)
         if (stockInfo && document.getElementById('inputYield').value == "3.5") {
             userYield = stockInfo.yield;
             document.getElementById('inputYield').value = userYield;
@@ -498,20 +483,18 @@
             const finalTicker = isKoreanStock ? ticker + ".KS" : ticker;
             const exchangeRate = await getExchangeRate();
 
-            // 주가 조회
             const response = await fetch(
                 `https://api.twelvedata.com/price?symbol=${finalTicker}&apikey=${API_KEY}`
             );
             const data = await response.json();
 
-            // 에러 처리
             if (data.status === "error") {
                 let errorMsg = `❌ '${ticker}'를 찾을 수 없습니다.\n\n`;
 
                 if (data.message && data.message.includes("Invalid API key")) {
-                    errorMsg += "🔑 API 키가 유효하지 않습니다.\napikey.js 파일을 확인해주세요.";
+                    errorMsg += "🔑 API 키가 유효하지 않습니다.";
                 } else if (data.code === 429) {
-                    errorMsg += "⏱️ API 호출 한도 초과!\n1분 후 다시 시도해주세요.\n\n💡 Free Plan: 하루 800회 제한";
+                    errorMsg += "⏱️ API 호출 한도 초과!\n1분 후 다시 시도해주세요.";
                 } else {
                     errorMsg += "💡 티커를 정확히 입력했는지 확인해주세요.\n예: AAPL (미국), 005930 (한국)";
                 }
@@ -521,23 +504,20 @@
             }
 
             if (!data.price) {
-                alert(`❌ '${ticker}'의 가격 정보를 가져올 수 없습니다.\n티커를 확인해주세요.`);
+                alert(`❌ '${ticker}'의 가격 정보를 가져올 수 없습니다.`);
                 return;
             }
 
-            // 가격 계산
             const priceUSD = parseFloat(data.price);
             const priceKRW = isKoreanStock ? priceUSD : Math.round(priceUSD * exchangeRate);
             const totalAssetKRW = priceKRW * quantity;
 
-            // 배당금 계산
             const annualDividendKRW = Math.round(totalAssetKRW * (userYield / 100));
             const monthlyAvgKRW = Math.round(annualDividendKRW / 12);
 
             const taxInfo = calculateTax(annualDividendKRW, isKoreanStock);
             const monthlyAfterTaxAvg = Math.round(taxInfo.afterTax / 12);
 
-            // 화면 업데이트
             const companyName = stockInfo ? stockInfo.name : ticker;
             document.getElementById('resCompanyName').innerText = companyName;
             document.getElementById('resPrice').innerText = '₩' + priceKRW.toLocaleString();
@@ -554,22 +534,19 @@
             const resultBox = document.getElementById('resultBox');
             resultBox.style.display = 'block';
 
-            // 차트 그리기
             const payMonths = stockInfo ? stockInfo.payMonths : 0;
 
             if (userYield <= 0) {
-                drawChart(0, []); // 배당 없는 종목
+                drawChart(0, []);
             } else {
                 drawChart(taxInfo.afterTax, payMonths);
             }
 
-            // 결과창 애니메이션
             const resultCard = resultBox.querySelector('.result-card');
             resultCard.style.animation = 'none';
-            resultCard.offsetHeight; // Reflow
+            resultCard.offsetHeight;
             resultCard.style.animation = 'fadeInUp 0.6s ease-out';
 
-            // 포커스 제거 & 스크롤
             document.activeElement.blur();
             setTimeout(() => {
                 resultBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -583,7 +560,7 @@
             if (error.message && error.message.includes('Failed to fetch')) {
                 errorMsg = "🌐 인터넷 연결을 확인해주세요.";
             } else if (error.message && error.message.includes('429')) {
-                errorMsg = "⏱️ API 호출 한도 초과!\n1분 후 다시 시도해주세요.";
+                errorMsg = "⏱️ API 호출 한도 초과!";
             }
 
             alert(errorMsg);
@@ -592,7 +569,6 @@
         }
     }
 
-    // ========== 차트 그리기 ==========
     function drawChart(annualAfterTax, payMonths) {
         const ctx = document.getElementById('dividendChart');
         if (myChart) myChart.destroy();
@@ -600,39 +576,33 @@
         let chartData = [];
 
         if (annualAfterTax === 0) {
-            // 배당 0원 종목
             chartData = Array(12).fill(0);
         } else if (payMonths === 0) {
-            // 매월 지급 (월배당)
             const monthlyAmount = Math.round(annualAfterTax / 12);
             chartData = Array(12).fill(monthlyAmount);
         } else if (Array.isArray(payMonths) && payMonths.length > 0) {
-            // 특정 월 지급 (분기 배당 등)
             chartData = Array(12).fill(0);
             const amountPerPayment = Math.round(annualAfterTax / payMonths.length);
             payMonths.forEach(month => {
                 chartData[month - 1] = amountPerPayment;
             });
         } else {
-            // 기본값 (균등 분배)
             chartData = Array(12).fill(Math.round(annualAfterTax / 12));
         }
 
         myChart = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['1월', '2월', '3월', '4월', '5월', '6월',
-                    '7월', '8월', '9월', '10월', '11월', '12월'],
+                labels: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
                 datasets: [{
                     label: '예상 수령액 (원)',
                     data: chartData,
                     backgroundColor: (context) => {
-                        // 배당 지급월 강조
                         const value = context.parsed.y;
                         return value > 0 ? '#00C851' : '#E5E8EB';
                     },
                     borderRadius: 8,
-                    barPercentage: 0.7 // 반응형 두께
+                    barPercentage: 0.7
                 }]
             },
             options: {
@@ -662,8 +632,21 @@
             }
         });
     }
-</script>
 
+    function savePortfolio() {
+        const ticker = document.getElementById('inputTicker').value.trim();
+        const quantity = document.getElementById('inputQuantity').value;
+
+        if (!ticker || !quantity) {
+            alert('종목과 수량을 입력해주세요.');
+            return;
+        }
+
+        document.getElementById('saveTicker').value = ticker;
+        document.getElementById('saveQuantity').value = quantity;
+        document.getElementById('saveForm').submit();
+    }
+</script>
 
 </body>
 </html>
