@@ -450,27 +450,33 @@
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
                     <div>
                         <div style="font-size: 24px; font-weight: 800; color: #3182F6;">
-                            <!-- 기존 하드코딩 "0% 달성" → 동적으로 -->
                             <span th:text="${achieveRate} + '% 달성'">0% 달성</span>
                         </div>
-
-                        <!-- 목표 금액 표시 -->
-                        <span>목표:
-    <b style="color: #191F28;"
-       th:text="${goalTargetWon > 0} ? ${#numbers.formatInteger(goalTargetWon, 0, 'COMMA')} + '원' : '미설정'">
-        미설정
-    </b>
-</span>
+                        <div style="font-size: 13px; color: #8B95A1; margin-top: 4px;">
+                            목표:
+                            <b style="color: #191F28;"
+                               th:text="${goalTargetWon > 0} ? ${#numbers.formatInteger(goalTargetWon, 0, 'COMMA')} + '원' : '미설정'">
+                                미설정
+                            </b>
+                        </div>
+                    </div>
+                    <div style="font-size: 13px; color: #3182F6; font-weight: 600;">목표 설정 →</div>
                 </div>
 
-                <div style="background: #E5E8EB; border-radius: 20px; height: 28px; overflow: hidden; position: relative; margin-bottom: 12px;">
-                    <div id="goalProgressBar"
-                         th:style="'background: linear-gradient(90deg, #3182F6, #6B9EFF); height: 100%; border-radius: 20px; transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1); width: ' + (${targetMonthly != null and targetMonthly > 0 ? progressPercent : 0}) + '%'"></div>
+                <div style="background: #E5E8EB; border-radius: 20px; height: 28px; overflow: hidden; margin-bottom: 12px;">
+                    <div id="goalProgressBar" style="
+                background: linear-gradient(90deg, #3182F6, #6B9EFF);
+                height: 100%;
+                border-radius: 20px;
+                width: 0%;
+                transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+            "></div>
                 </div>
 
                 <div style="display: flex; justify-content: space-between; font-size: 13px; color: #8B95A1;">
                     <span>현재: <b style="color: #191F28;"><span th:text="${#numbers.formatInteger(monthlyAvg, 0, 'COMMA')}">0</span>원</b></span>
-                    <span>목표: <b style="color: #191F28;" th:text="${targetMonthly != null and targetMonthly > 0 ? #numbers.formatInteger(targetMonthly * 10000, 0, 'COMMA') + '원' : '미설정'}">미설정</b></span>
+                    <span>목표: <b style="color: #191F28;"
+                                 th:text="${goalTargetWon > 0} ? ${#numbers.formatInteger(goalTargetWon, 0, 'COMMA')} + '원' : '미설정'">미설정</b></span>
                 </div>
             </div>
         </a>
@@ -490,6 +496,7 @@
 </div>
 
 <script th:inline="javascript">
+    const monthlyData = /*[[${monthlyTotals}]]*/ [];
     const achieveRate = /*[[${achieveRate}]]*/ 0;
 
     const ctx = document.getElementById('monthlyChart');
@@ -531,25 +538,20 @@
                     y: {
                         beginAtZero: true,
                         grid: { color: '#F2F4F6' },
-                        ticks: {
-                            callback: (v) => v.toLocaleString() + '원'
-                        }
+                        ticks: { callback: (v) => v.toLocaleString() + '원' }
                     },
-                    x: {
-                        grid: { display: false }
-                    }
+                    x: { grid: { display: false } }
                 }
             }
         });
     }
-    const achieveRate = /*[[${achieveRate}]]*/ 0;
+
     window.addEventListener('load', () => {
         setTimeout(() => {
             const bar = document.getElementById('goalProgressBar');
             if (bar) bar.style.width = achieveRate + '%';
         }, 400);
     });
-
 </script>
 
 </body>
