@@ -452,13 +452,6 @@
                         <div style="font-size: 24px; font-weight: 800; color: #3182F6;">
                             <span th:text="${achieveRate} + '% 달성'">0% 달성</span>
                         </div>
-                        <div style="font-size: 13px; color: #8B95A1; margin-top: 4px;">
-                            목표:
-                            <b style="color: #191F28;"
-                               th:text="${goalTargetWon > 0} ? ${#numbers.formatInteger(goalTargetWon, 0, 'COMMA')} + '원' : '미설정'">
-                                미설정
-                            </b>
-                        </div>
                     </div>
                     <div style="font-size: 13px; color: #3182F6; font-weight: 600;">목표 설정 →</div>
                 </div>
