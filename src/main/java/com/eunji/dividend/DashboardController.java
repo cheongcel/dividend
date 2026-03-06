@@ -94,10 +94,16 @@ public class DashboardController {
         else if (stockCount == 2) investmentStatus = "2개 종목 보유";
         else investmentStatus = "분산 투자 중";
 
+        // ⭐ 총 자산 평가액 계산
+        BigDecimal totalAssetValue = stockDetails.stream()
+                .map(s -> (BigDecimal) s.get("assetValue"))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
         model.addAttribute("totalAnnual", totalAnnual);
         model.addAttribute("monthlyAvg", monthlyAvg);
         model.addAttribute("stockCount", stockCount);
         model.addAttribute("investmentStatus", investmentStatus);
+        model.addAttribute("totalAssetValue", totalAssetValue);  // ⭐ 추가
         model.addAttribute("monthlyTotals", monthlyTotals);
         model.addAttribute("stockDetails", stockDetails);
 
