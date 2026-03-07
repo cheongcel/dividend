@@ -22,6 +22,7 @@ public class CalculatorController {
     private final DividendService dividendService;
     private final DividendRepository dividendRepository;
     private final UserPortfolioRepository userPortfolioRepository;
+    private final GoalRepository goalRepository;  // ⭐ 추가
 
     // ⭐ API 키 주입
     @Value("${api.key:DEMO_KEY}")
@@ -206,16 +207,27 @@ public class CalculatorController {
         return "calendar";
     }
 
-    // 5. 파이어족 목표 페이지 - ⭐ 누구나 볼 수 있음! (로그인 체크 제거)
+    // 5. 목표 페이지 - ⭐ 누구나 볼 수 있음! (로그인 체크 제거)
     @GetMapping("/goal")
     public String showGoal(@RequestParam(value = "targetMonthly", required = false, defaultValue = "0") int targetMonthly,
                            HttpSession session,
                            Model model) {
-        // ⭐ 로그인 체크 제거! (페이지는 누구나 볼 수 있게)
         Long userId = (Long) session.getAttribute("userId");
 
-        if (targetMonthly > 0) {
-            session.setAttribute("goalTarget", (long) targetMonthly);
+        // ⭐ 목표 저장 (DB에 영구 저장!)
+        if (userId != null && targetMonthly > 0) {
+            GoalEntity goal = goalRepository.findByUserId(userId)
+                    .orElse(new GoalEntity());
+            goal.setUserId(userId);
+            goal.setTargetMonthly((long) targetMonthly);
+            goalRepository.save(goal);
+        }
+
+        // ⭐ 저장된 목표 불러오기 (입력 안 했을 때)
+        if (targetMonthly == 0 && userId != null) {
+            targetMonthly = goalRepository.findByUserId(userId)
+                    .map(g -> g.getTargetMonthly().intValue())
+                    .orElse(0);
         }
 
         List<UserPortfolio> myStocks = new ArrayList<>();
