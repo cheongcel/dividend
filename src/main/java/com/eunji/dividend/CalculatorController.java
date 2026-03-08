@@ -207,23 +207,14 @@ public class CalculatorController {
         return "calendar";
     }
 
-    // 5. 목표 페이지 - ⭐ 누구나 볼 수 있음! (로그인 체크 제거)
+    // 5. 목표 페이지 - 보기 (GET)
     @GetMapping("/goal")
     public String showGoal(@RequestParam(value = "targetMonthly", required = false, defaultValue = "0") int targetMonthly,
                            HttpSession session,
                            Model model) {
         Long userId = (Long) session.getAttribute("userId");
 
-        // ⭐ 목표 저장 (DB에 영구 저장!)
-        if (userId != null && targetMonthly > 0) {
-            GoalEntity goal = goalRepository.findByUserId(userId)
-                    .orElse(new GoalEntity());
-            goal.setUserId(userId);
-            goal.setTargetMonthly((long) targetMonthly);
-            goalRepository.save(goal);
-        }
-
-        // ⭐ 저장된 목표 불러오기 (입력 안 했을 때)
+        // ⭐ 저장된 목표 불러오기
         if (targetMonthly == 0 && userId != null) {
             targetMonthly = goalRepository.findByUserId(userId)
                     .map(g -> g.getTargetMonthly().intValue())
@@ -233,7 +224,6 @@ public class CalculatorController {
         List<UserPortfolio> myStocks = new ArrayList<>();
         BigDecimal currentAnnualDividend = BigDecimal.ZERO;
 
-        // ⭐ 로그인 했을 때만 내 포트폴리오 조회
         if (userId != null) {
             myStocks = userPortfolioRepository.findByUserId(userId);
 
@@ -288,5 +278,26 @@ public class CalculatorController {
         model.addAttribute("gapMonthly", gapMonthly);
 
         return "goal";
+    }
+
+    // ⭐ 새로 추가: 목표 저장 (POST)
+    @PostMapping("/goal")
+    public String saveGoal(@RequestParam("targetMonthly") int targetMonthly,
+                           HttpSession session) {
+        Long userId = (Long) session.getAttribute("userId");
+
+        if (userId == null) {
+            return "redirect:/login";
+        }
+
+        // DB에 저장
+        GoalEntity goal = goalRepository.findByUserId(userId)
+                .orElse(new GoalEntity());
+        goal.setUserId(userId);
+        goal.setTargetMonthly((long) targetMonthly);
+        goalRepository.save(goal);
+
+        // 저장 후 목표 페이지로 리다이렉트
+        return "redirect:/goal?targetMonthly=" + targetMonthly;
     }
 }

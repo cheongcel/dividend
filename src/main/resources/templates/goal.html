@@ -159,7 +159,7 @@
         <p style="color: #6B7684; margin-top: 10px; font-size: 15px;">
             월 얼마의 배당금을 받고 싶으신가요?
         </p>
-        <form action="/goal" method="get">
+        <form action="/goal" method="post">
             <div class="input-wrapper">
                 <input type="number" name="targetMonthly" class="input-money"
                        th:value="${targetMonthly > 0 ? targetMonthly : ''}"
