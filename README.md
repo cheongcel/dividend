@@ -8,7 +8,7 @@ An intuitive asset management service designed to eliminate the complexity of di
 
 ## 🌐 Live Demo
 
-**🔗 Try it now:** https://divy-m1ta.onrender.com
+**🔗 Try it now:** divy.yoossi.dev
 
 > Deployed on Render with PostgreSQL
 
